@@ -1,0 +1,4 @@
+Flask==0.9
+flask-sqlalchemy==0.16
+loremipsum==1.0.2
+pymongo==2.4.2
