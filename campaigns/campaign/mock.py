@@ -4,7 +4,6 @@ from random import choice
 from base.util import __gen_uuid, __serialize_json_datetime, __unserialize_json_datetime
 from campaigns.campaign.model import CampaignType, Campaign
 from campaigns.default_config import MOCK_DATE_RANGE_DAYS
-from loremipsum import generate_sentence, generate_paragraph
 
 __author__ = 'nubela'
 
@@ -40,8 +39,8 @@ def gen_campaigns(campaign_type=CampaignType.ALL, total_campaigns=100):
         c = Campaign()
         c.id = __gen_uuid()
         c.publish_datetime = _gen_random_datetime(MOCK_DATE_RANGE_DAYS)
-        c.title = generate_sentence()
-        c.description = generate_paragraph()
+        c.title = "Mock Title"
+        c.description = "Mock Description"
         c.type = choice(campaign_type)
         c.picture_url = "http://lorempixel.com/400/400"
 
