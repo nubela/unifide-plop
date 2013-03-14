@@ -6,7 +6,7 @@ from campaigns.campaign.model import CampaignType, Campaign
 from campaigns.default_config import MOCK_DATE_RANGE_DAYS
 
 __author__ = 'nubela'
-
+CACHE = {}
 
 def _gen_random_datetime(random_day_range):
     seconds_a_day = 24 * 60 * 60
@@ -14,7 +14,12 @@ def _gen_random_datetime(random_day_range):
     timestamp = __serialize_json_datetime(now)
     start_timestamp = timestamp - (random_day_range * seconds_a_day)
     end_timestamp = timestamp + (random_day_range * seconds_a_day)
-    random_timestamp = choice(range(start_timestamp, end_timestamp))
+
+    cache_key = "%d%d" % (int(start_timestamp), int(end_timestamp))
+    if cache_key not in CACHE:
+        CACHE[cache_key] = range(int(start_timestamp), int(end_timestamp))
+
+    random_timestamp = choice(CACHE[cache_key])
     return __unserialize_json_datetime(random_timestamp)
 
 
@@ -28,7 +33,7 @@ def gen_campaigns(campaign_type=CampaignType.ALL, total_campaigns=100):
     :return:
     """
     if campaign_type == CampaignType.ALL:
-        campaign_type = [attr for attr in dir(CampaignType()) if not callable(attr) and not attr.startswith("__")]
+        campaign_type = [getattr(CampaignType,attr) for attr in dir(CampaignType()) if not callable(attr) and not attr.startswith("__")]
         campaign_type.remove(CampaignType.ALL)
     else: campaign_type = [campaign_type]
 
@@ -37,7 +42,6 @@ def gen_campaigns(campaign_type=CampaignType.ALL, total_campaigns=100):
     generated_campaigns = []
     for _ in range(total_campaigns):
         c = Campaign()
-        c.id = __gen_uuid()
         c.publish_datetime = _gen_random_datetime(MOCK_DATE_RANGE_DAYS)
         c.title = "Mock Title"
         c.description = "Mock Description"

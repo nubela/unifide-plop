@@ -1,5 +1,5 @@
 import uuid
-import datetime
+from datetime import datetime
 import time
 
 def __gen_uuid():

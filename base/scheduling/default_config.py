@@ -1,0 +1,1 @@
+MONGO_COLLECTION_NAME = "scheduling"

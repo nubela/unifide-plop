@@ -1,23 +1,12 @@
-from base.base_model import Base
+from base.scheduling.model import SchedulingBase
 
 
-__author__ = 'nubela'
-
-
-class Comment():
-    def __init__(self):
-        self.text = None
-
-
-class Campaign(Base):
+class Campaign(SchedulingBase):
     def __init__(self, **kwargs):
-        self.id = None
         self.title = None
         self.description = None
         self.picture_url = None
         self.type = None
-        self.publish_datetime = None
-        self.comment_id_lis = []
         self.item_id_lis = []
 
         #event specific
@@ -28,8 +17,8 @@ class Campaign(Base):
             setattr(self, k, v)
 
     @staticmethod
-    def unserialize(self, json):
-        return Campaign(**json.loads(json))
+    def unserialize(dic):
+        return Campaign(**dic)
 
 
 class CampaignType:

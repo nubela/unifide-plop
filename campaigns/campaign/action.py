@@ -1,4 +1,7 @@
-from campaigns.campaign.model import CampaignType
+from base.db import get_mongo
+from base.scheduling.decorator import schedulable
+from campaigns.default_config import MONGO_COLLECTION_NAME
+
 
 def get(campaign_obj_id):
     """
@@ -7,23 +10,22 @@ def get(campaign_obj_id):
     :param campaign_obj_id:
     :return:
     """
-    pass
+    collection = __get_collection()
+    if campaign_obj_id is None:
+        return collection.find_one()
+    return collection.find_one({"_id": campaign_obj_id})
 
 
-def get_all(type=CampaignType.ALL, limit=5):
-    """
-    Get all campaigns up to _now_, capped by a stated limit.
-
-    :param type:
-    :param limit:
-    :return:
-    """
-    pass
+@schedulable
+def save(campaign_obj):
+    col = __get_collection()
+    id = col.insert(campaign_obj.serialize())
+    return id
 
 
-def get_all_in_duration(from_datetime, to_datetime):
-    pass
-
-
-def put_comment(campaign_obj, comment_obj):
-    pass
+def __get_collection(coll=[]):
+    if coll == []:
+        mongo_db = get_mongo()
+        collection = mongo_db[MONGO_COLLECTION_NAME]
+        coll += [collection]
+    return coll[0]
