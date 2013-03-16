@@ -4,7 +4,8 @@ class Base:
         self.modification_timestamp = None
 
     def serialize(self):
-        return {k: v for k, v in self.__dict__.iteritems()}
+        banned_keys = ["_id",]
+        return {k: v for k, v in self.__dict__.iteritems() if k not in banned_keys}
 
     @staticmethod
     def unserialize(json):
