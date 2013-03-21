@@ -47,6 +47,7 @@ def generate_login_form():
             label="Password",
             validators=[FormValidator.REQUIRED, FormValidator.NOT_BLANK]
         ),
+        FormType.SUBMIT(),
     ]
     return generate_form(form)
 
@@ -82,6 +83,11 @@ class FormType:
     __ALPHANUM = "alphanum"
     __DATE = "dateIso"
     __PASSWD = "passwd"
+    __SUBMIT = "submit"
+
+    @staticmethod
+    def SUBMIT():
+        return FormType(FormType.__EMAIL, "submit", tag_type="button", input_type="submit", cls="btn")
 
     @staticmethod
     def EMAIL(formid, label=None, placeholder=None, validators=None):
@@ -112,13 +118,16 @@ class FormType:
         return FormType(FormType.__PASSWD, formid, label=label, placeholder=placeholder, validators=validators,
                         input_type="password")
 
-    def __init__(self, parsley_type, form_id, input_type=None, label=None, placeholder=None, validators=None):
+    def __init__(self, parsley_type, form_id, input_type=None, label=None, placeholder=None, validators=None,
+                 tag_type=None, cls=None):
         self.form_id = form_id
         self.parsley_type = parsley_type
         self.input_type = input_type if input_type is not None else "text"
         self.label = label if label is not None else ""
         self.placeholder = placeholder if placeholder is not None else ""
         self.validators = validators if validators is not None else []
+        self.tag_type = tag_type if tag_type is not None else "input"
+        self.cls = cls
 
 
     def validators_to_string(self):
@@ -129,8 +138,14 @@ class FormType:
 
 
     def __str__(self):
-        return "<input type='%s' id='%s' name='%s' placeholder='%s' data-type='%s' %s>" % (
-            self.input_type, self.form_id, self.form_id, self.placeholder, self.parsley_type,
+        return "<%s type='%s' class='%s' id='%s' name='%s' placeholder='%s' data-type='%s' %s>" % (
+            self.tag_type,
+            self.input_type,
+            self.cls,
+            self.form_id,
+            self.form_id,
+            self.placeholder,
+            self.parsley_type,
             self.validators_to_string())
 
 
