@@ -1,5 +1,5 @@
 import datetime
-from base.users.util import generate_login_form, FormType
+from base.users.util import generate_login_form, generate_form
 import campaigns
 from base import scheduling
 from flask import render_template
@@ -15,7 +15,11 @@ def index():
 
 @app.route('/login/', methods=['GET'])
 def login():
-    login_form = generate_login_form()
+    raw_form = generate_login_form()
+    login_form = generate_form(raw_form, **{
+        "action": "/",
+        "method": "post",
+    })
     return render_template("login.html", **{
         "login_form": login_form,
-        })
+    })

@@ -49,7 +49,7 @@ def generate_login_form():
         ),
         FormType.SUBMIT(),
     ]
-    return generate_form(form)
+    return form
 
 
 def __gen_passwd_hash(passwd, salt):
@@ -60,10 +60,10 @@ def __gen_passwd_hash(passwd, salt):
     return salted_key.hexdigest()
 
 
-def generate_form(form_lis, style=None):
+def generate_form(form_lis, style=None, **kwargs):
     if style is None:
         style = FormStyle.HORIZONTAL
-    return style.parse(form_lis)
+    return style.parse(form_lis, **kwargs)
 
 
 class classproperty(property):
@@ -116,7 +116,7 @@ class FormType:
     @staticmethod
     def PASSWORD(formid, label=None, placeholder=None, validators=None):
         return FormType(FormType.__PASSWD, formid, label=label, placeholder=placeholder, validators=validators,
-                        input_type="password")
+            input_type="password")
 
     def __init__(self, parsley_type, form_id, input_type=None, label=None, placeholder=None, validators=None,
                  tag_type=None, cls=None):
@@ -187,7 +187,6 @@ class FormValidator:
 
 class FormStyle:
     __HORIZONTAL = "form-horizontal"
-    __INLINE = "form-inline"
 
     @classproperty
     def HORIZONTAL(cls):
@@ -200,8 +199,15 @@ class FormStyle:
     def __init__(self, style):
         self.style = style
 
-    def parse(self, input_lis):
-        start = "<form class='%s' data-validate='parsley'>" % self.style
+    def parse(self, input_lis, **kwargs):
+        def kwargs_to_string():
+            s = ""
+            for k, v in kwargs.iteritems():
+                t = "%s='%s'" % (k, v)
+                s = "%s %s" % (s, t)
+            return s
+
+        start = "<form class='%s' data-validate='parsley' %s>" % (self.style, kwargs_to_string())
         end = "</form>"
         middle = ""
 
@@ -219,7 +225,4 @@ class FormStyle:
                 label = form_type.label
                 populated = grp_str % (name, label, str(form_type))
                 middle = "%s%s" % (middle, populated)
-            elif self.style == FormStyle.INLINE:
-                pass
-
         return "%s%s%s" % (start, middle, end)
