@@ -1,6 +1,5 @@
 class User:
     def __init__(self, **kwargs):
-        self.id = None
         self.username = None
         self.first_name = ""
         self.middle_name = ""

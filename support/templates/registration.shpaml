@@ -40,4 +40,4 @@ html
                                 Shopping Cart
         div.topPadding | &nbsp;
         div.container
-            {{login_form|safe}}
+            {{registration_form|safe}}

@@ -9,6 +9,11 @@ def send_confirmation(saved_user_obj,
     pass
 
 
+def get_user_by_attr(**kwargs):
+    coll = __get_collection()
+    return coll.find_one(kwargs)
+
+
 def save(user_obj,
          need_confirmation=False,
          confirmation_email_subject=None,
@@ -32,8 +37,8 @@ def save(user_obj,
 
     saved_user_obj = save_obj()
     if need_confirmation: send_confirmation(saved_user_obj,
-                                            confirmation_email_subject,
-                                            confirmation_email_html)
+        confirmation_email_subject,
+        confirmation_email_html)
     return saved_user_obj
 
 
@@ -60,7 +65,7 @@ def set_passwd(saved_user_obj, new_passwd):
     passwd_hash = __gen_passwd_hash(new_passwd, saved_user_obj._id)
     saved_user_obj.passwd_hash = passwd_hash
     coll = __get_collection()
-    coll.update({'_id':saved_user_obj._id}, {"$set": saved_user_obj.serialize()}, upsert=False)
+    coll.update({'_id': saved_user_obj._id}, {"$set": saved_user_obj.serialize()}, upsert=False)
     return saved_user_obj
 
 

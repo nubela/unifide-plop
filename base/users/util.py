@@ -22,7 +22,7 @@ def get_form_values(req, form):
     names = [x.form_id for x in form]
     dic = {}
     for n in names:
-        dic[n] = req.get(n, None)
+        dic[n] = req.args.get(n, req.form.get(n, None))
     return dic
 
 
@@ -33,7 +33,7 @@ def generate_login_form():
     DEV USE: Look at this function to figure out how to generate
     forms
 
-    :return html_string_safe:
+    :return form_skeleton_obj:
     """
     form = [
         FormType.ALPHANUM(
@@ -47,7 +47,7 @@ def generate_login_form():
             label="Password",
             validators=[FormValidator.REQUIRED, FormValidator.NOT_BLANK]
         ),
-        FormType.SUBMIT(),
+        FormType.SUBMIT("Login"),
     ]
     return form
 
@@ -86,8 +86,8 @@ class FormType:
     __SUBMIT = "submit"
 
     @staticmethod
-    def SUBMIT():
-        return FormType(FormType.__EMAIL, "submit", tag_type="button", input_type="submit", cls="btn")
+    def SUBMIT(text):
+        return FormType(FormType.__EMAIL, "submit", tag_type="button", input_type="submit", cls="btn", text=text)
 
     @staticmethod
     def EMAIL(formid, label=None, placeholder=None, validators=None):
@@ -119,7 +119,7 @@ class FormType:
             input_type="password")
 
     def __init__(self, parsley_type, form_id, input_type=None, label=None, placeholder=None, validators=None,
-                 tag_type=None, cls=None):
+                 tag_type=None, cls=None, **kwargs):
         self.form_id = form_id
         self.parsley_type = parsley_type
         self.input_type = input_type if input_type is not None else "text"
@@ -128,7 +128,7 @@ class FormType:
         self.validators = validators if validators is not None else []
         self.tag_type = tag_type if tag_type is not None else "input"
         self.cls = cls
-
+        self.text = kwargs["text"] if "text" in kwargs else ""
 
     def validators_to_string(self):
         """
@@ -138,15 +138,29 @@ class FormType:
 
 
     def __str__(self):
-        return "<%s type='%s' class='%s' id='%s' name='%s' placeholder='%s' data-type='%s' %s>" % (
-            self.tag_type,
-            self.input_type,
-            self.cls,
-            self.form_id,
-            self.form_id,
-            self.placeholder,
-            self.parsley_type,
-            self.validators_to_string())
+        if self.form_id == FormType.__SUBMIT:
+            return "<%s type='%s' class='%s' id='%s' placeholder='%s' data-type='%s' %s>%s</%s>" % (
+                self.tag_type,
+                self.input_type,
+                self.cls,
+                self.form_id,
+                self.form_id,
+                self.placeholder,
+                self.parsley_type,
+                self.validators_to_string(),
+                self.text,
+                self.tag_type
+                )
+        else:
+            return "<%s type='%s' class='%s' id='%s' name='%s' placeholder='%s' data-type='%s' %s>" % (
+                self.tag_type,
+                self.input_type,
+                self.cls,
+                self.form_id,
+                self.form_id,
+                self.placeholder,
+                self.parsley_type,
+                self.validators_to_string())
 
 
 class FormValidator:
