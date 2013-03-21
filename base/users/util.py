@@ -2,11 +2,27 @@ import hashlib
 
 
 def generate_login_form():
-    print FormType.ALPHANUM.label("asd")
-    form = (
-        [FormType.ALPHANUM.label("Username"), FormValidator.REQUIRED, FormValidator.NOT_BLANK],
-        [FormType.PASSWORD.label("Password"), FormValidator.REQUIRED, FormValidator.NOT_BLANK],
-        )
+    """
+    Generates a traditional login form, bootstrap-styled.
+
+    DEV USE: Look at this function to figure out how to generate
+    forms
+
+    :return html_string_safe:
+    """
+    form = [
+        FormType.ALPHANUM(
+            "username",
+            label="Username",
+            placeholder="Your username here..",
+            validators=[FormValidator.REQUIRED, FormValidator.NOT_BLANK]
+        ),
+        FormType.ALPHANUM(
+            "password",
+            label="Password",
+            validators=[FormValidator.REQUIRED, FormValidator.NOT_BLANK]
+        ),
+    ]
     return generate_form(form)
 
 
@@ -19,16 +35,9 @@ def __gen_passwd_hash(passwd, salt):
 
 
 def generate_form(form_lis, style=None):
-    if style == None:
+    if style is None:
         style = FormStyle.HORIZONTAL
-
-    input_str = []
-    for input in form_lis:
-        form_type = filter(lambda x: x.__class__ == FormBaseType, input)[0]
-        validators = filter(lambda x: x.__class__ == FormBaseValidator, input)
-        for v in validators:
-            form_type.add_validator(v)
-        input_str += [(form_type, str(form_type))]
+    return style.parse(form_lis)
 
 
 class classproperty(property):
@@ -42,72 +51,53 @@ class FormType:
     See: http://parsleyjs.org/documentation.html
     """
 
-    @classproperty
-    def EMAIL(cls):
-        return FormBaseType("email")
+    @staticmethod
+    def EMAIL(formid, label=None, placeholder=None, validators=None):
+        return FormType("email", formid, label=label, placeholder=placeholder, validators=validators)
 
-    @classproperty
-    def URL(cls):
-        return FormBaseType("url")
+    @staticmethod
+    def URL(formid, label=None, placeholder=None, validators=None):
+        return FormType("url", formid, label=label, placeholder=placeholder, validators=validators)
 
-    @classproperty
-    def DIGIT(cls):
-        return FormBaseType("digits")
+    @staticmethod
+    def DIGIT(formid, label=None, placeholder=None, validators=None):
+        return FormType("digits", formid, label=label, placeholder=placeholder, validators=validators)
 
-    @classproperty
-    def NUMBER(cls):
-        return FormBaseType("number")
+    @staticmethod
+    def NUMBER(formid, label=None, placeholder=None, validators=None):
+        return FormType("number", formid, label=label, placeholder=placeholder, validators=validators)
 
-    @classproperty
-    def ALPHANUM(cls):
-        return FormBaseType("alphanum")
+    @staticmethod
+    def ALPHANUM(formid, label=None, placeholder=None, validators=None):
+        return FormType("alphanum", formid, label=label, placeholder=placeholder, validators=validators)
 
-    @classproperty
-    def DATE(cls):
-        return FormBaseType("dateIso")
+    @staticmethod
+    def DATE(formid, label=None, placeholder=None, validators=None):
+        return FormType("dateIso", formid, label=label, placeholder=placeholder, validators=validators)
 
-    @classproperty
-    def PASSWORD(cls):
-        return FormBaseType("passwd", "password")
+    @staticmethod
+    def PASSWORD(formid, label=None, placeholder=None, validators=None):
+        return FormType("passwd", formid, label=label, placeholder=placeholder, validators=validators, input_type="password")
 
-
-class FormBaseType:
-    """
-    DEVS SHOULD NOT USE THIS.
-    Base class for where the magic happens to convert a field into a string representation coupled
-    with its validators
-    """
-
-    def __init__(self, parsley_type, input_type="text"):
-        self.input_type = input_type
+    def __init__(self, parsley_type, form_id, input_type=None, label=None, placeholder=None, validators=None):
+        self.form_id = form_id
         self.parsley_type = parsley_type
-        self.validators = []
-        self.label = ""
-        self.name = ""
-        self.placeholder = ""
+        self.input_type = input_type if input_type is not None else "text"
+        self.label = label if label is not None else ""
+        self.placeholder = placeholder if placeholder is not None else ""
+        self.validators = validators if validators is not None else []
 
-    def add_validator(self, v):
-        self.validators += [v]
 
-    def validator_to_str(self):
-        if len(self.validators) > 0:
-            return " ".join([str(v) for v in self.validators])
-        return ""
+    def validators_to_string(self):
+        """
+        Stringify and join the validators
+        """
+        return " ".join([str(x) for x in self.validators])
 
-    def label(self, lbl):
-        self.label = lbl
-        return self
-
-    def name(self, name):
-        self.name = name
-        return self
-
-    def placeholder(self, placeholder):
-        self.placeholder = placeholder
-        return self
 
     def __str__(self):
-        return "<input type='%s' data-type='%s' %s>" % (self.input_type, self.parsley_type, self.validator_to_str())
+        return "<input type='%s' id='%s' name='%s' placeholder='%s' data-type='%s' %s>" % (
+        self.input_type, self.form_id, self.form_id, self.placeholder, self.parsley_type, self.validators_to_string())
 
 
 class FormValidator:
@@ -116,31 +106,24 @@ class FormValidator:
     """
 
     @classproperty
-    def REQUIRED(cls):
-        return FormBaseValidator('data-required').val("true")
+    def REQUIRED(val):
+        return FormValidator('data-required').val("true")
 
     @classproperty
     def NOT_BLANK(cls):
-        return FormBaseValidator('data-notblank').val("true")
+        return FormValidator('data-notblank').val("true")
 
     @classproperty
     def MIN_LENGTH(cls):
-        return FormBaseValidator('data-minlength')
+        return FormValidator('data-minlength')
 
     @classproperty
     def MAX_LENGTH(cls):
-        return FormBaseValidator('data-maxlength')
+        return FormValidator('data-maxlength')
 
     @classproperty
     def EQUAL_TO(cls):
-        return FormBaseValidator('data-equalto')
-
-
-class FormBaseValidator:
-    """
-    DEVS SHOULD NOT USE THIS.
-    Base class for where the magic happens to convert a validator into a string representation
-    """
+        return FormValidator('data-equalto')
 
     def __init__(self, validator_type):
         self.validator_type = validator_type
@@ -154,8 +137,8 @@ class FormBaseValidator:
 
 
 class FormStyle:
-    HORIZONTAL = "form-horizontal"
-    INLINE = "form-inline"
+    __HORIZONTAL = "form-horizontal"
+    __INLINE = "form-inline"
 
     @classproperty
     def HORIZONTAL(cls):
@@ -168,13 +151,13 @@ class FormStyle:
     def __init__(self, style):
         self.style = style
 
-    def style(self, type_and_input_lis):
+    def parse(self, input_lis):
         start = "<form class='%s' data-validate='parsley'>" % self.style
         end = "</form>"
         middle = ""
 
-        for form_type, input_str in type_and_input_lis:
-            if self.style == FormStyle.HORIZONTAL:
+        for form_type in input_lis:
+            if self.style == FormStyle.__HORIZONTAL:
                 grp_str = """
   <div class="control-group">
     <label class="control-label" for="%s">%s</label>
@@ -183,9 +166,9 @@ class FormStyle:
     </div>
   </div>
                 """
-                name = form_type.name
+                name = form_type.form_id
                 label = form_type.label
-                populated = grp_str % (name, label, input_str)
+                populated = grp_str % (name, label, str(form_type))
                 middle = "%s%s" % (middle, populated)
             elif self.style == FormStyle.INLINE:
                 pass
