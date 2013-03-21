@@ -1,8 +1,8 @@
 import datetime
-from backend.app import app
 import campaigns
 from base import scheduling
 from flask import render_template
+from support.app import app
 
 @app.route('/', methods=['GET'])
 def index():

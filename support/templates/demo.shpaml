@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+html
+    head
+        title | Unifide Demo
+        <link href="/media/css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="/media/css/demo.css" rel="stylesheet" media="screen">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="/media/js/bootstrap.min.js"></script>
+
+    body
+        div.navbar.navbar-inverse.navbar-fixed-top
+            .navbar-inner
+                .container
+                    a.brand href="http://getgom.com" | Unifide
+                    ul.nav
+                        li.active
+                            a href="/" | Campaigns
+                        li
+                            a href="/showcase/" | Items
+                        li
+                            a href="/keep-gom-alive/" | Blog
+                        li
+                            a href="/keep-gom-alive/" | Business
+                        li
+                            a href="/keep-gom-alive/" | Control Panel
+                    ul.nav.pull-right
+                        li
+                            a href="/login/"
+                                <i class="icon-plus icon-white"></i>
+                                Register
+                        li
+                            a href="/login/"
+                                <i class="icon-user icon-white"></i>
+                                Login
+                        li
+                            a href="/login/"
+                                <i class="icon-shopping-cart icon-white"></i>
+                                Shopping Cart
+        div.jumbotron.masthead
+            .container
+                h1 | A Unifide Demo
+                p.lead | To demonstrate the customisability and cohesion of the Unifide platform
+                p
+                    a href="mailto:hello@unifide.sg" class="btn btn-primary btn-large" | Setup a meeting with us
+        div.graybox
+            .container
+                Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo
+
+        .container
+            div.holder
+                h1 | Campaign Stream.
+                p.lead | This is a mashup of the latest 3 campaign items
+
+                div.row-fluid
+                    div.span4
+                        > img src="http://lorempixel.com/300/300/?1"
+                        h2 | Title
+                        p | Description
+
+                    div.span4
+                        > img src="http://lorempixel.com/300/300/?2"
+                        h2 | Title
+                        p | Description
+
+                    div.span4
+                        > img src="http://lorempixel.com/300/300/?3"
+                        h2 | Title
+                        p | Description
+
+            > hr
+
+            div.holder
+                h1 | Promotions Stream.
+                p.lead | This is a stream of the latest 3 promotional campaigns with comments
+                div.row-fluid
+                    div.span4
+                        > img src="http://lorempixel.com/300/300/?4"
+                        h2 | Title
+                        p | Description
+                        table.comment-holder.table-striped.table
+                            tr
+                                td
+                                    span.name | Steven Goh
+                                    span.comment | This is a comment
+                            tr
+                                td
+                                    span.name | Kian Wei
+                                    span.comment | This is a reply
+                            tr
+                                td
+                                    > input type="text" placeholder="Your comment here.."
+
+                    div.span4
+                        > img src="http://lorempixel.com/300/300/?5"
+                        h2 | Title
+                        p | Description
+                        table.comment-holder.table-striped.table
+                            tr
+                                td
+                                    span.name | Steven Goh
+                                    span.comment | This is a comment
+                            tr
+                                td
+                                    span.name | Kian Wei
+                                    span.comment | This is a reply
+                            tr
+                                td
+                                    > input type="text" placeholder="Your comment here.."
+
+                    div.span4
+                        > img src="http://lorempixel.com/300/300/?6"
+                        h2 | Title
+                        p | Description
+                        table.comment-holder.table-striped.table
+                            tr
+                                td
+                                    span.name | Steven Goh
+                                    span.comment | This is a comment
+                            tr
+                                td
+                                    span.name | Kian Wei
+                                    span.comment | This is a reply
+                            tr
+                                td
+                                    > input type="text" placeholder="Your comment here.."
+
+
+
+            > hr
+
+            div.holder
+                h1 | Events Stream.
+                p.lead | This is a stream of campaigns which are 3 events that are happening soon
+                div.row-fluid
+                    div.span4
+                        > img src="http://lorempixel.com/300/300/?7"
+                        h2 | Title
+                        p | Description
+                        p
+                            button.btn | I'm going
+
+                    div.span4
+                        > img src="http://lorempixel.com/300/300/?8"
+                        h2 | Title
+                        p | Description
+                        p
+                            button.btn | I'm going
+
+                    div.span4
+                        > img src="http://lorempixel.com/300/300/?9"
+                        h2 | Title
+                        p | Description
+                        p
+                            button.btn | I'm going
+
+        footer.footer
+            This is a footer

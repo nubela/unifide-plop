@@ -1,2 +1,2 @@
 #!/bin/bash
-python /Users/nubela/Workspace/transcompiler-watcher/src/watch.py /Users/nubela/Workspace/unifide-plop
+python /home/nubela/Workspace/transcompiler-watcher/src/watch.py /home/nubela/Workspace/unifide-plop/support

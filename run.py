@@ -1,5 +1,5 @@
 # This file runs the backend control of the web/mobile apps
-from backend.web import app
+from support.web import app
 
 if __name__ == '__main__':
     app.debug = True
