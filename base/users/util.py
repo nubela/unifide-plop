@@ -1,4 +1,29 @@
 import hashlib
+from validate_email import validate_email
+
+
+def validate_form_w_request(req, form):
+    vals = get_form_values(req, form)
+    for item in form:
+        item_val = vals[item.form_id]
+        if item.parsley_type == FormType.__EMAIL:
+            if not validate_email(item_val):
+                return False
+        elif item.parsley_type == FormType.__NUMBER:
+            if not isinstance(item_val, int):
+                return False
+        elif item.parsley_type == FormType.__DIGIT:
+            if not isinstance(item_val, (int, long, float)):
+                return False
+    return True
+
+
+def get_form_values(req, form):
+    names = [x.form_id for x in form]
+    dic = {}
+    for n in names:
+        dic[n] = req.get(n, None)
+    return dic
 
 
 def generate_login_form():
@@ -50,34 +75,42 @@ class FormType:
     Enumberator for the ParsleyJS types
     See: http://parsleyjs.org/documentation.html
     """
+    __EMAIL = "email"
+    __URL = "url"
+    __DIGIT = "digits"
+    __NUMBER = "number"
+    __ALPHANUM = "alphanum"
+    __DATE = "dateIso"
+    __PASSWD = "passwd"
 
     @staticmethod
     def EMAIL(formid, label=None, placeholder=None, validators=None):
-        return FormType("email", formid, label=label, placeholder=placeholder, validators=validators)
+        return FormType(FormType.__EMAIL, formid, label=label, placeholder=placeholder, validators=validators)
 
     @staticmethod
     def URL(formid, label=None, placeholder=None, validators=None):
-        return FormType("url", formid, label=label, placeholder=placeholder, validators=validators)
+        return FormType(FormType.__URL, formid, label=label, placeholder=placeholder, validators=validators)
 
     @staticmethod
     def DIGIT(formid, label=None, placeholder=None, validators=None):
-        return FormType("digits", formid, label=label, placeholder=placeholder, validators=validators)
+        return FormType(FormType.__DIGIT, formid, label=label, placeholder=placeholder, validators=validators)
 
     @staticmethod
     def NUMBER(formid, label=None, placeholder=None, validators=None):
-        return FormType("number", formid, label=label, placeholder=placeholder, validators=validators)
+        return FormType(FormType.__NUMBER, formid, label=label, placeholder=placeholder, validators=validators)
 
     @staticmethod
     def ALPHANUM(formid, label=None, placeholder=None, validators=None):
-        return FormType("alphanum", formid, label=label, placeholder=placeholder, validators=validators)
+        return FormType(FormType.__ALPHANUM, formid, label=label, placeholder=placeholder, validators=validators)
 
     @staticmethod
     def DATE(formid, label=None, placeholder=None, validators=None):
-        return FormType("dateIso", formid, label=label, placeholder=placeholder, validators=validators)
+        return FormType(FormType.__DATE, formid, label=label, placeholder=placeholder, validators=validators)
 
     @staticmethod
     def PASSWORD(formid, label=None, placeholder=None, validators=None):
-        return FormType("passwd", formid, label=label, placeholder=placeholder, validators=validators, input_type="password")
+        return FormType(FormType.__PASSWD, formid, label=label, placeholder=placeholder, validators=validators,
+                        input_type="password")
 
     def __init__(self, parsley_type, form_id, input_type=None, label=None, placeholder=None, validators=None):
         self.form_id = form_id
@@ -97,7 +130,8 @@ class FormType:
 
     def __str__(self):
         return "<input type='%s' id='%s' name='%s' placeholder='%s' data-type='%s' %s>" % (
-        self.input_type, self.form_id, self.form_id, self.placeholder, self.parsley_type, self.validators_to_string())
+            self.input_type, self.form_id, self.form_id, self.placeholder, self.parsley_type,
+            self.validators_to_string())
 
 
 class FormValidator:
