@@ -2,58 +2,11 @@
 <html>
     <head>
         <title>Unifide Demo</title>
-        <link href="/media/css/bootstrap.min.css" rel="stylesheet" media="screen">
-        <link href="/media/css/demo.css" rel="stylesheet" media="screen">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="http://code.jquery.com/jquery.js"></script>
-        <script src="/media/js/bootstrap.min.js"></script>
+        {% include "includes/imports.html" %}
     </head>
 
     <body>
-        <div class="navbar navbar-inverse navbar-fixed-top">
-            <div class="navbar-inner">
-                <div class="container">
-                    <a href="http://getgom.com" class="brand">Unifide</a>
-                    <ul class="nav">
-                        <li class="active">
-                            <a href="/">Campaigns</a>
-                        </li>
-                        <li>
-                            <a href="/showcase/">Items</a>
-                        </li>
-                        <li>
-                            <a href="/keep-gom-alive/">Blog</a>
-                        </li>
-                        <li>
-                            <a href="/keep-gom-alive/">Business</a>
-                        </li>
-                        <li>
-                            <a href="/keep-gom-alive/">Control Panel</a>
-                        </li>
-                    </ul>
-                    <ul class="nav pull-right">
-                        <li>
-                            <a href="/login/">
-                                <i class="icon-plus icon-white"></i>
-                                Register
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/login/">
-                                <i class="icon-user icon-white"></i>
-                                Login
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/login/">
-                                <i class="icon-shopping-cart icon-white"></i>
-                                Shopping Cart
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+        {% include "includes/navbar.html" %}
         <div class="jumbotron masthead">
             <div class="container">
                 <h1>A Unifide Demo</h1>

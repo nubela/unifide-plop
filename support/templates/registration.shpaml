@@ -2,42 +2,10 @@
 html
     head
         title | Unifide Demo
-        <link href="/media/css/bootstrap.min.css" rel="stylesheet" media="screen">
-        <link href="/media/css/demo.css" rel="stylesheet" media="screen">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="http://code.jquery.com/jquery.js"></script>
-        <script src="/media/js/bootstrap.min.js"></script>
-        <script src="/media/js/parsley.min.js"></script>
+        {% include "includes/imports.html" %}
 
     body
-        div.navbar.navbar-inverse.navbar-fixed-top
-            .navbar-inner
-                .container
-                    a.brand href="http://getgom.com" | Unifide
-                    ul.nav
-                        li
-                            a href="/" | Campaigns
-                        li
-                            a href="/showcase/" | Items
-                        li
-                            a href="/keep-gom-alive/" | Blog
-                        li
-                            a href="/keep-gom-alive/" | Business
-                        li
-                            a href="/keep-gom-alive/" | Control Panel
-                    ul.nav.pull-right
-                        li
-                            a href="/login/"
-                                <i class="icon-plus icon-white"></i>
-                                Register
-                        li.active
-                            a href="/login/"
-                                <i class="icon-user icon-white"></i>
-                                Login
-                        li
-                            a href="/login/"
-                                <i class="icon-shopping-cart icon-white"></i>
-                                Shopping Cart
+        {% include "includes/navbar.html" %}
         div.topPadding | &nbsp;
         div.container
             {{registration_form|safe}}

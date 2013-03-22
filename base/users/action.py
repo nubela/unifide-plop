@@ -9,9 +9,9 @@ def send_confirmation(saved_user_obj,
     pass
 
 
-def get_user_by_attr(**kwargs):
+def get_user_by_attr(attr_dic):
     coll = __get_collection()
-    return coll.find_one(kwargs)
+    return coll.find_one(attr_dic)
 
 
 def save(user_obj,

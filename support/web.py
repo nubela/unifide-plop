@@ -1,4 +1,5 @@
 import datetime
+from base.users.action import get_user_by_attr
 from base.users.util import generate_login_form, generate_form, FormType, FormValidator, validate_form_w_request, get_form_values
 from base.util import __gen_uuid
 import campaigns
@@ -11,6 +12,7 @@ def index():
     c = scheduling.get_before(campaigns.Campaign, datetime.datetime.utcnow())
     return render_template("demo.html", **{
         "campaigns": c,
+        "is_campaign": True,
     })
 
 
@@ -23,6 +25,7 @@ def login():
     })
     return render_template("login.html", **{
         "login_form": login_form,
+        "is_login": True,
     })
 
 
@@ -32,23 +35,23 @@ def __get_registration_form():
             "email",
             label="Email address",
             placeholder="your@email_addr.com",
-            validators=[FormValidator.REQUIRED, FormValidator.NOT_BLANK]
+            validators=[FormValidator.REQUIRED]
         ),
         FormType.ALPHANUM(
             "username",
             label="Username",
-            placeholder="Your username here..",
-            validators=[FormValidator.REQUIRED, FormValidator.NOT_BLANK]
+            placeholder="",
+            validators=[FormValidator.REQUIRED]
         ),
-        FormType.ALPHANUM(
+        FormType.PASSWORD(
             "password",
             label="Password",
-            validators=[FormValidator.REQUIRED, FormValidator.NOT_BLANK]
+            validators=[FormValidator.REQUIRED]
         ),
-        FormType.ALPHANUM(
+        FormType.PASSWORD(
             "cfm_password",
             label="Re-enter password",
-            validators=[FormValidator.REQUIRED, FormValidator.NOT_BLANK]
+            validators=[FormValidator.REQUIRED]
         ),
         FormType.DIGIT(
             "contact_no",
@@ -68,6 +71,7 @@ def register():
             })
         return render_template("registration.html", **{
             "registration_form": registration_form,
+            "is_register": True,
         })
     else:
         values = get_form_values(request, __get_registration_form())
@@ -75,4 +79,13 @@ def register():
         user_obj = users.User(
             **dic
         )
-        users.save(user_obj)
+        if not get_user_by_attr({
+            "$or": [{
+                        "email": user_obj.email
+                    }, {
+                        "username": user_obj.username
+                    }]
+        }):
+            users.save(user_obj)
+            return "Saved!"
+        return "Already registered."

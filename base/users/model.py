@@ -1,4 +1,7 @@
-class User:
+from base.base_model import Base
+
+
+class User(Base):
     def __init__(self, **kwargs):
         self.username = None
         self.first_name = ""

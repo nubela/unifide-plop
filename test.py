@@ -1,4 +1,5 @@
-from base.users.util import generate_login_form
+from base.users.util import generate_login_form, generate_form
 
 
-print generate_login_form()
+form = generate_login_form()
+print generate_form(form)

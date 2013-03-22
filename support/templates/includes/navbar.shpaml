@@ -1,0 +1,28 @@
+div.navbar.navbar-inverse.navbar-fixed-top
+    .navbar-inner
+        .container
+            a.brand href="/" | Unifide
+            ul.nav
+                li {% if is_campaign %}class="active"{% endif %}
+                    a href="/" | Campaigns
+                li
+                    a href="/showcase/" | Items
+                li
+                    a href="/keep-gom-alive/" | Blog
+                li
+                    a href="/keep-gom-alive/" | Business
+                li
+                    a href="/keep-gom-alive/" | Control Panel
+            ul.nav.pull-right
+                li {% if is_register %}class="active"{% endif %}
+                    a href="/register/"
+                        <i class="icon-plus icon-white"></i>
+                        Register
+                li {% if is_login %}class="active"{% endif %}
+                    a href="/login/"
+                        <i class="icon-user icon-white"></i>
+                        Login
+                li
+                    a href="/login/"
+                        <i class="icon-shopping-cart icon-white"></i>
+                        Shopping Cart

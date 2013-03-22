@@ -42,7 +42,7 @@ def generate_login_form():
             placeholder="Your username here..",
             validators=[FormValidator.REQUIRED, FormValidator.NOT_BLANK]
         ),
-        FormType.ALPHANUM(
+        FormType.PASSWORD(
             "password",
             label="Password",
             validators=[FormValidator.REQUIRED, FormValidator.NOT_BLANK]
@@ -84,10 +84,13 @@ class FormType:
     __DATE = "dateIso"
     __PASSWD = "passwd"
     __SUBMIT = "submit"
+    CUSTOM_TYPES = ["passwd",
+                    "submit",
+                    ]
 
     @staticmethod
     def SUBMIT(text):
-        return FormType(FormType.__EMAIL, "submit", tag_type="button", input_type="submit", cls="btn", text=text)
+        return FormType(FormType.__SUBMIT, "submit", tag_type="button", input_type="submit", cls="btn", text=text)
 
     @staticmethod
     def EMAIL(formid, label=None, placeholder=None, validators=None):
@@ -127,7 +130,7 @@ class FormType:
         self.placeholder = placeholder if placeholder is not None else ""
         self.validators = validators if validators is not None else []
         self.tag_type = tag_type if tag_type is not None else "input"
-        self.cls = cls
+        self.cls = cls if cls is not None else ""
         self.text = kwargs["text"] if "text" in kwargs else ""
 
     def validators_to_string(self):
@@ -138,19 +141,26 @@ class FormType:
 
 
     def __str__(self):
-        if self.form_id == FormType.__SUBMIT:
+        print self.parsley_type
+        if self.parsley_type == FormType.__SUBMIT:
             return "<%s type='%s' class='%s' id='%s' placeholder='%s' data-type='%s' %s>%s</%s>" % (
                 self.tag_type,
                 self.input_type,
                 self.cls,
                 self.form_id,
-                self.form_id,
                 self.placeholder,
                 self.parsley_type,
                 self.validators_to_string(),
                 self.text,
-                self.tag_type
+                self.tag_type,
                 )
+        elif self.parsley_type == FormType.__PASSWD:
+            return "<input type='password' class='%s' id='%s' name='%s' %s>" % (
+                self.cls,
+                self.form_id,
+                self.form_id,
+                self.validators_to_string(),
+            )
         else:
             return "<%s type='%s' class='%s' id='%s' name='%s' placeholder='%s' data-type='%s' %s>" % (
                 self.tag_type,
