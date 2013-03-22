@@ -37,8 +37,8 @@ def save(user_obj,
 
     saved_user_obj = save_obj()
     if need_confirmation: send_confirmation(saved_user_obj,
-        confirmation_email_subject,
-        confirmation_email_html)
+                                            confirmation_email_subject,
+                                            confirmation_email_html)
     return saved_user_obj
 
 
@@ -67,6 +67,49 @@ def set_passwd(saved_user_obj, new_passwd):
     coll = __get_collection()
     coll.update({'_id': saved_user_obj._id}, {"$set": saved_user_obj.serialize()}, upsert=False)
     return saved_user_obj
+
+
+def generate_token(user_obj, account_activity):
+    """
+    Generates a lasting token for a specific account activity.
+    (EG: Email verification of a new account)
+
+    Removes an existing if it already exists, and then replace
+    it with a new one that this will generate.
+    """
+    pass
+
+
+def remove_token(user_obj, account_activity):
+    """
+    Removes a token for a specific account activity.
+    (EG: When a user has a verified his/her new account)
+
+    Does nothing if there does not exists a token for
+    the activity.
+    """
+    pass
+
+
+def __get_token(user_obj, account_activity):
+    """
+    Fetches token for a user's account activity.
+    Returns None if it does not exists.
+    """
+    pass
+
+
+def check_token(user_obj, account_activity, token):
+    """
+    Returns a boolean on whether a token is the correct
+    token for a specific account activity for a user.
+    """
+    pass
+
+
+class AccountActivity:
+    VERIFY_EMAIL_ADDR = "verify_email"
+    RESET_PASSWORD = "passwd_reset"
 
 
 class AccountStatus:

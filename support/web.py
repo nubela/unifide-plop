@@ -1,11 +1,10 @@
 import datetime
-from base.users.action import get_user_by_attr
-from base.users.util import generate_login_form, generate_form, FormType, FormValidator, validate_form_w_request, get_form_values
-from base.util import __gen_uuid
+from base.users.util import generate_login_form, generate_form, FormType, FormValidator, get_form_values
 import campaigns
 from base import scheduling, users
-from flask import render_template, request, jsonify
+from flask import render_template, request
 from support.app import app
+
 
 @app.route('/', methods=['GET'])
 def index():
@@ -68,18 +67,19 @@ def register():
         registration_form = generate_form(__get_registration_form(), **{
             "action": "/register/",
             "method": "post",
-            })
+        })
         return render_template("registration.html", **{
             "registration_form": registration_form,
             "is_register": True,
         })
     else:
         values = get_form_values(request, __get_registration_form())
-        dic = {k:v for k,v in values.iteritems()}
+        dic = {k: v for k, v in values.iteritems()}
         user_obj = users.User(
             **dic
         )
-        if not get_user_by_attr({
+        user_obj.account_status = users.AccountStatus.AWAITING_CONFIRMATION
+        if not users.get_user_by_attr({
             "$or": [{
                         "email": user_obj.email
                     }, {
