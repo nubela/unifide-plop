@@ -1,5 +1,4 @@
 import datetime
-from base.users import check_token, get_user_by_attr
 from base.users.util import generate_login_form, generate_form, FormType, FormValidator, get_form_values
 import campaigns
 from base import scheduling, users
@@ -36,7 +35,7 @@ def login():
     form_values = get_form_values(request, login_form)
     username = form_values["username"]
     passwd = form_values["password"]
-    user_obj = get_user_by_attr({"username": username})
+    user_obj = users.get_user_by_attr({"username": username})
     if users.auth(user_obj, passwd):
         login_user(user_obj)
         return "Logined"
@@ -112,7 +111,7 @@ def register():
 @app.route('/register/confirm/<user_id>/<token>/', methods=['GET'])
 def confirm_registration(user_id, token):
     user_obj = users.get(user_id)
-    if check_token(user_obj, users.AccountActivity.VERIFY_EMAIL_ADDR, token):
+    if users.check_token(user_obj, users.AccountActivity.VERIFY_EMAIL_ADDR, token):
         users.confirm(user_obj)
         users.remove_token(user_obj, users.AccountActivity.VERIFY_EMAIL_ADDR)
         return "Success!"
@@ -142,13 +141,13 @@ def __passwd_reset_form():
 def reset_password(user_id, token):
     print user_id
     user_obj = users.get(user_id)
-    if check_token(user_obj, users.AccountActivity.RESET_PASSWORD, token):
+    if users.check_token(user_obj, users.AccountActivity.RESET_PASSWORD, token):
         #show passwd reset form
         if request.method == "GET":
             form = __passwd_reset_form()
             return render_template("passwd_reset.html", **{
                 "form": generate_form(form, **{
-                    "method":"post"
+                    "method": "post"
                 }),
             })
 
@@ -185,10 +184,9 @@ def forgot_password():
 
     elif request.method == "POST":
         form_values = get_form_values(request, __forgot_passwd_form())
-        user_obj = get_user_by_attr({"email": form_values["email"]})
+        user_obj = users.get_user_by_attr({"email": form_values["email"]})
         users.send_reset_passwd_notice(user_obj)
         return "Check your email"
-
 
 
 @app.route('/test-login/', methods=['GET'])
