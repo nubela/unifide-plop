@@ -98,9 +98,17 @@ def __get_collection(coll=[]):
     return coll[0]
 
 
-def send_reset_passwd_notice(user_obj, email_subj, email_html):
+def send_reset_passwd_notice(user_obj, email_subj=None, email_html=None, relative_url=None):
+    if email_subj is None:
+        email_subj = "Password Reset"
+    if email_html is None:
+        email_html = read_template("emails/reset_passwd.html")
+    if relative_url is None:
+        relative_url = "/user/reset-password/"
+
+
     token = generate_token(user_obj, AccountActivity.RESET_PASSWORD)
-    url = "%s/user/reset-password/%s/%s/" % (DOMAIN, user_obj.id, token)
+    url = "%s%s%s/%s/" % (DOMAIN, relative_url, user_obj.id(), token)
     email_html = email_html % {"url": url}
     emails.send_email(user_obj.email, email_subj, email_html)
 

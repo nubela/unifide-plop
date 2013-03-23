@@ -140,24 +140,55 @@ def __passwd_reset_form():
 
 @app.route('/user/reset-password/<user_id>/<token>/', methods=['GET', 'POST'])
 def reset_password(user_id, token):
+    print user_id
     user_obj = users.get(user_id)
     if check_token(user_obj, users.AccountActivity.RESET_PASSWORD, token):
         #show passwd reset form
         if request.method == "GET":
             form = __passwd_reset_form()
             return render_template("passwd_reset.html", **{
-                "form": generate_form(form),
+                "form": generate_form(form, **{
+                    "method":"post"
+                }),
             })
 
         #parse reset form
         else:
             values = get_form_values(request, __passwd_reset_form())
-            new_passwd = values["password"]
+            new_passwd = values["passwd"]
             users.set_passwd(user_obj, new_passwd)
             users.remove_token(user_obj, users.AccountActivity.RESET_PASSWORD)
             return "Changed password!"
 
     return "Fail!"
+
+
+def __forgot_passwd_form():
+    return [
+        FormType.EMAIL("email",
+            label="What is your email address?",
+            validators=[FormValidator.REQUIRED]
+        )
+    ]
+
+
+@app.route('/user/forgot-password/', methods=['GET', 'POST'])
+def forgot_password():
+    form = __forgot_passwd_form()
+    if request.method == "GET":
+        return render_template("forgot_password.html", **{
+            "form": generate_form(form, **{
+                "action": "/user/forgot-password/",
+                "method": "post",
+            })
+        })
+
+    elif request.method == "POST":
+        form_values = get_form_values(request, __forgot_passwd_form())
+        user_obj = get_user_by_attr({"email": form_values["email"]})
+        users.send_reset_passwd_notice(user_obj)
+        return "Check your email"
+
 
 
 @app.route('/test-login/', methods=['GET'])
