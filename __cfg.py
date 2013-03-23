@@ -1,4 +1,5 @@
 #general
+DOMAIN = "http://localhost:5001"
 MOCK_MODE = True
 INSTALLED_PACKAGES = [
     "articles",

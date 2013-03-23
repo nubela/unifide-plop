@@ -1,4 +1,5 @@
 import datetime
+from base.users import check_token
 from base.users.util import generate_login_form, generate_form, FormType, FormValidator, get_form_values
 import campaigns
 from base import scheduling, users
@@ -89,3 +90,55 @@ def register():
             users.save(user_obj)
             return "Saved!"
         return "Already registered."
+
+
+@app.route('/register/confirm/<user_id>/<token>/', methods=['GET'])
+def confirm_registration(user_id, token):
+    user_obj = users.get(user_id)
+    if check_token(user_obj, users.AccountActivity.VERIFY_EMAIL_ADDR, token):
+        users.confirm(user_obj)
+        users.remove_token(user_obj, users.AccountActivity.VERIFY_EMAIL_ADDR)
+        return "Success!"
+    return "Fail!"
+
+
+def __passwd_reset_form():
+    return [
+        FormType.PASSWORD(
+            "passwd",
+            label="New Password",
+            validators=[FormValidator.REQUIRED]
+        ),
+        FormType.PASSWORD(
+            "cfm_password",
+            label="Re-enter Password",
+            validators=[
+                FormValidator.REQUIRED,
+                FormValidator.EQUAL_TO("passwd")
+            ]
+        ),
+        FormType.SUBMIT("Change"),
+    ]
+
+
+@app.route('/user/reset-password/<user_id>/<token>/', methods=['GET', 'POST'])
+def reset_password(user_id, token):
+    user_obj = users.get(user_id)
+    if check_token(user_obj, users.AccountActivity.RESET_PASSWORD, token):
+
+        #show passwd reset form
+        if request.method == "GET":
+            form = __passwd_reset_form()
+            return render_template("passwd_reset.html", **{
+                "form": generate_form(form),
+            })
+
+        #parse reset form
+        else:
+            values = get_form_values(request, __passwd_reset_form())
+            new_passwd = values["password"]
+            users.set_passwd(user_obj, new_passwd)
+            users.remove_token(user_obj, users.AccountActivity.RESET_PASSWORD)
+            return "Changed password!"
+
+    return "Fail!"

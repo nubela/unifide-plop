@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+html
+    head
+        title | Password Reset
+        {% include "includes/imports.html" %}
+
+    body
+        {% include "includes/navbar.html" %}
+        div.topPadding | &nbsp;
+        div.container
+            {{form|safe}}

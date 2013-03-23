@@ -3,12 +3,32 @@ from base.db import get_mongo
 from base.users.default_config import USERS_COLLECTION_NAME
 from base.users.util import __gen_passwd_hash
 from base.util import __gen_uuid
+from cfg import DOMAIN
 from flask import json
+
+
+def get(user_id):
+    coll = __get_collection()
+    return coll.find_one({"_id": user_id})
+
+
+def confirm(user_obj):
+    """
+    Updates a newly registered user account from a AWAITING_CONFIRMATION status
+    to an ENABLED status.
+
+    :param user_obj:
+    :return:
+    """
+    coll = __get_collection()
+    user_obj.account_status = AccountStatus.ENABLED
+    coll.update({'_id': user_obj._id}, {"$set": user_obj.serialize()}, upsert=False)
 
 
 def send_confirmation(user_obj, email_subject, email_html):
     token = generate_token(user_obj, AccountActivity.VERIFY_EMAIL_ADDR)
-    email_html = email_html % {"token": token}
+    url = "%s/register/confirm/%s/" % (DOMAIN, token)
+    email_html = email_html % {"url": url}
     emails.send_email(user_obj.email, email_subject, email_html)
 
 
@@ -61,7 +81,8 @@ def __get_collection(coll=[]):
 
 def send_reset_passwd_notice(user_obj, email_subj, email_html):
     token = generate_token(user_obj, AccountActivity.RESET_PASSWORD)
-    email_html = email_html % {"token": token}
+    url = "%s/user/reset-password/%s/%s/" % (DOMAIN, user_obj.id, token)
+    email_html = email_html % {"url": url}
     emails.send_email(user_obj.email, email_subj, email_html)
 
 

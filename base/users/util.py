@@ -86,7 +86,7 @@ class FormType:
     __SUBMIT = "submit"
     CUSTOM_TYPES = ["passwd",
                     "submit",
-                    ]
+    ]
 
     @staticmethod
     def SUBMIT(text):
@@ -159,7 +159,7 @@ class FormType:
                 self.form_id,
                 self.form_id,
                 self.validators_to_string(),
-            )
+                )
         else:
             return "<%s type='%s' class='%s' id='%s' name='%s' placeholder='%s' data-type='%s' %s>" % (
                 self.tag_type,
@@ -193,9 +193,10 @@ class FormValidator:
     def MAX_LENGTH(cls):
         return FormValidator('data-maxlength')
 
-    @classproperty
-    def EQUAL_TO(cls):
-        return FormValidator('data-equalto')
+    @staticmethod
+    def EQUAL_TO(form_id):
+        return FormValidator('data-equalto').val("#%s" % (form_id))
+
 
     def __init__(self, validator_type):
         self.validator_type = validator_type
