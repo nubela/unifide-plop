@@ -87,7 +87,7 @@ def register():
                         "username": user_obj.username
                     }]
         }):
-            users.save(user_obj)
+            users.save(user_obj, need_confirmation=True, confirmation_email_subject="Complete your account registration")
             return "Saved!"
         return "Already registered."
 

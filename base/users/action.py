@@ -5,6 +5,7 @@ from base.users.util import __gen_passwd_hash
 from base.util import __gen_uuid
 from cfg import DOMAIN
 from flask import json
+from support.util.template import read_template
 
 
 def get(user_id):
@@ -25,11 +26,18 @@ def confirm(user_obj):
     coll.update({'_id': user_obj._id}, {"$set": user_obj.serialize()}, upsert=False)
 
 
-def send_confirmation(user_obj, email_subject, email_html):
+def send_confirmation(user_obj, email_subject=None, email_html=None):
+    if email_subject is None:
+        email_subject = "Complete your account registration"
+    if email_html is None:
+        email_html = read_template("emails/verify_email.html")
+
     token = generate_token(user_obj, AccountActivity.VERIFY_EMAIL_ADDR)
     url = "%s/register/confirm/%s/" % (DOMAIN, token)
+    print url
+    print email_html
     email_html = email_html % {"url": url}
-    emails.send_email(user_obj.email, email_subject, email_html)
+    emails.send_email(user_obj.email, email_subject, email_html, async=False)
 
 
 def get_user_by_attr(attr_dic):
@@ -55,8 +63,6 @@ def save(user_obj,
 
     if need_confirmation:
         assert user_obj.email is not None
-        assert confirmation_email_html is not None
-        assert confirmation_email_subject is not None
 
     saved_user_obj = save_obj()
     if need_confirmation:
@@ -105,11 +111,11 @@ def generate_token(user_obj, account_activity):
     Removes an existing if it already exists, and then replace
     it with a new one that this will generate.
     """
-    tokens = json.loads(user_obj.tokens)
-    tokens[account_activity] = __gen_uuid()
+    user_obj.tokens[account_activity] = __gen_uuid()
+
     coll = __get_collection()
-    coll.update({'_id': user_obj._id}, {"$set": json.dumps(tokens)}, upsert=False)
-    return tokens[account_activity]
+    coll.update({'_id': user_obj._id}, {"$set": user_obj.serialize()}, upsert=False)
+    return user_obj.tokens[account_activity]
 
 
 def remove_token(user_obj, account_activity):
@@ -120,11 +126,10 @@ def remove_token(user_obj, account_activity):
     Does nothing if there does not exists a token for
     the activity.
     """
-    tokens = json.loads(user_obj.tokens)
-    if account_activity in tokens:
-        del tokens[account_activity]
+    if account_activity in user_obj.tokens:
+        del user_obj.tokens[account_activity]
         coll = __get_collection()
-        coll.update({'_id': user_obj._id}, {"$set": json.dumps(tokens)}, upsert=False)
+        coll.update({'_id': user_obj._id}, {"$set": user_obj.serialize()}, upsert=False)
 
 
 def __get_token(user_obj, account_activity):
