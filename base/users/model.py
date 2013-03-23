@@ -30,5 +30,5 @@ class User(Base):
 
 
     @staticmethod
-    def unserialize(json):
-        return User(**json.loads(json))
+    def unserialize(dic):
+        return User(**dic)

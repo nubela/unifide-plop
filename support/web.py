@@ -87,7 +87,9 @@ def register():
                         "username": user_obj.username
                     }]
         }):
-            users.save(user_obj, need_confirmation=True, confirmation_email_subject="Complete your account registration")
+            users.save(user_obj, need_confirmation=True,
+                confirmation_email_subject="Complete your account registration",
+                confirmation_relative_url="/register/confirm/")
             return "Saved!"
         return "Already registered."
 
@@ -95,6 +97,7 @@ def register():
 @app.route('/register/confirm/<user_id>/<token>/', methods=['GET'])
 def confirm_registration(user_id, token):
     user_obj = users.get(user_id)
+    print user_obj
     if check_token(user_obj, users.AccountActivity.VERIFY_EMAIL_ADDR, token):
         users.confirm(user_obj)
         users.remove_token(user_obj, users.AccountActivity.VERIFY_EMAIL_ADDR)
