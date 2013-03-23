@@ -18,6 +18,7 @@ class User(Base):
 
         #account meta
         self.account_status = None
+        self.tokens = {}
 
         for k, v in kwargs.iteritems():
             setattr(self, k, v)

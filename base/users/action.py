@@ -1,12 +1,15 @@
+from base import emails
 from base.db import get_mongo
 from base.users.default_config import USERS_COLLECTION_NAME
 from base.users.util import __gen_passwd_hash
+from base.util import __gen_uuid
+from flask import json
 
 
-def send_confirmation(saved_user_obj,
-                      confirmation_email_subject,
-                      confirmation_email_html):
-    pass
+def send_confirmation(user_obj, email_subject, email_html):
+    token = generate_token(user_obj, AccountActivity.VERIFY_EMAIL_ADDR)
+    email_html = email_html % {"token": token}
+    emails.send_email(user_obj.email, email_subject, email_html)
 
 
 def get_user_by_attr(attr_dic):
@@ -36,9 +39,11 @@ def save(user_obj,
         assert confirmation_email_subject is not None
 
     saved_user_obj = save_obj()
-    if need_confirmation: send_confirmation(saved_user_obj,
-                                            confirmation_email_subject,
-                                            confirmation_email_html)
+    if need_confirmation:
+        send_confirmation(saved_user_obj,
+            confirmation_email_subject,
+            confirmation_email_html)
+
     return saved_user_obj
 
 
@@ -54,8 +59,10 @@ def __get_collection(coll=[]):
     return coll[0]
 
 
-def send_reset_passwd_notice(user_obj, confirmation_email_html=None):
-    pass
+def send_reset_passwd_notice(user_obj, email_subj, email_html):
+    token = generate_token(user_obj, AccountActivity.RESET_PASSWORD)
+    email_html = email_html % {"token": token}
+    emails.send_email(user_obj.email, email_subj, email_html)
 
 
 def set_passwd(saved_user_obj, new_passwd):
@@ -77,7 +84,11 @@ def generate_token(user_obj, account_activity):
     Removes an existing if it already exists, and then replace
     it with a new one that this will generate.
     """
-    pass
+    tokens = json.loads(user_obj.tokens)
+    tokens[account_activity] = __gen_uuid()
+    coll = __get_collection()
+    coll.update({'_id': user_obj._id}, {"$set": json.dumps(tokens)}, upsert=False)
+    return tokens[account_activity]
 
 
 def remove_token(user_obj, account_activity):
@@ -88,7 +99,11 @@ def remove_token(user_obj, account_activity):
     Does nothing if there does not exists a token for
     the activity.
     """
-    pass
+    tokens = json.loads(user_obj.tokens)
+    if account_activity in tokens:
+        del tokens[account_activity]
+        coll = __get_collection()
+        coll.update({'_id': user_obj._id}, {"$set": json.dumps(tokens)}, upsert=False)
 
 
 def __get_token(user_obj, account_activity):
@@ -96,7 +111,8 @@ def __get_token(user_obj, account_activity):
     Fetches token for a user's account activity.
     Returns None if it does not exists.
     """
-    pass
+    tokens = json.loads(user_obj.tokens)
+    return tokens[account_activity]
 
 
 def check_token(user_obj, account_activity, token):
@@ -104,7 +120,8 @@ def check_token(user_obj, account_activity, token):
     Returns a boolean on whether a token is the correct
     token for a specific account activity for a user.
     """
-    pass
+    tokens = json.loads(user_obj.tokens)
+    return tokens[account_activity] == token
 
 
 class AccountActivity:

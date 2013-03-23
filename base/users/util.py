@@ -141,7 +141,6 @@ class FormType:
 
 
     def __str__(self):
-        print self.parsley_type
         if self.parsley_type == FormType.__SUBMIT:
             return "<%s type='%s' class='%s' id='%s' placeholder='%s' data-type='%s' %s>%s</%s>" % (
                 self.tag_type,

@@ -1,4 +1,4 @@
-from base.local_config import MONGO_DB, MONGO_HOST, MONGO_PORT
+from cfg import MONGO_HOST, MONGO_PORT, MONGO_DB
 from pymongo import MongoClient
 
 def get_mongo(db=[]):
