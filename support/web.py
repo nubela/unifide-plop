@@ -1,9 +1,10 @@
 import datetime
-from base.users import check_token
+from base.users import check_token, get_user_by_attr
 from base.users.util import generate_login_form, generate_form, FormType, FormValidator, get_form_values
 import campaigns
 from base import scheduling, users
 from flask import render_template, request
+from flask.ext.login import login_user, login_required, logout_user
 from support.app import app
 
 
@@ -18,15 +19,28 @@ def index():
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
-    raw_form = generate_login_form()
-    login_form = generate_form(raw_form, **{
-        "action": "/",
-        "method": "post",
-    })
-    return render_template("login.html", **{
-        "login_form": login_form,
-        "is_login": True,
-    })
+    login_form = generate_login_form()
+
+    #login form
+    if request.method == "GET":
+        login_form = generate_form(login_form, **{
+            "action": "/login/",
+            "method": "post",
+        })
+        return render_template("login.html", **{
+            "login_form": login_form,
+            "is_login": True,
+        })
+
+    #parse login credentials
+    form_values = get_form_values(request, login_form)
+    username = form_values["username"]
+    passwd = form_values["password"]
+    user_obj = get_user_by_attr({"username": username})
+    if users.auth(user_obj, passwd):
+        login_user(user_obj)
+        return "Logined"
+    return "Did not auth"
 
 
 def __get_registration_form():
@@ -87,9 +101,10 @@ def register():
                         "username": user_obj.username
                     }]
         }):
-            users.save(user_obj, need_confirmation=True,
+            user_obj = users.save(user_obj, need_confirmation=True,
                 confirmation_email_subject="Complete your account registration",
                 confirmation_relative_url="/register/confirm/")
+            users.set_passwd(user_obj, values["password"])
             return "Saved!"
         return "Already registered."
 
@@ -97,7 +112,6 @@ def register():
 @app.route('/register/confirm/<user_id>/<token>/', methods=['GET'])
 def confirm_registration(user_id, token):
     user_obj = users.get(user_id)
-    print user_obj
     if check_token(user_obj, users.AccountActivity.VERIFY_EMAIL_ADDR, token):
         users.confirm(user_obj)
         users.remove_token(user_obj, users.AccountActivity.VERIFY_EMAIL_ADDR)
@@ -128,7 +142,6 @@ def __passwd_reset_form():
 def reset_password(user_id, token):
     user_obj = users.get(user_id)
     if check_token(user_obj, users.AccountActivity.RESET_PASSWORD, token):
-
         #show passwd reset form
         if request.method == "GET":
             form = __passwd_reset_form()
@@ -145,3 +158,16 @@ def reset_password(user_id, token):
             return "Changed password!"
 
     return "Fail!"
+
+
+@app.route('/test-login/', methods=['GET'])
+@login_required
+def test_login():
+    return "You are logined"
+
+
+@app.route('/logout/', methods=['GET'])
+@login_required
+def test_login():
+    logout_user()
+    return "You are logged out."

@@ -23,6 +23,18 @@ class User(Base):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
 
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        from base.users import AccountStatus
+        return self.account_status == AccountStatus.ENABLED
+
+    def is_anonymous(self):
+        return self.username is None and self.email is None
+
+    def get_id(self):
+        return self.id()
 
     @property
     def full_name(self):

@@ -2,10 +2,11 @@ from base import emails
 from base.db import get_mongo
 from base.users.model import User
 from base.users.default_config import USERS_COLLECTION_NAME
-from base.users.util import __gen_passwd_hash
+from base.users.util import gen_passwd_hash
 from base.util import __gen_uuid
 from bson.objectid import ObjectId
 from cfg import DOMAIN
+from support.app import login_manager
 from support.util.template import read_template
 
 
@@ -45,7 +46,12 @@ def send_confirmation(user_obj, email_subject=None, email_html=None, relative_ur
 
 def get_user_by_attr(attr_dic):
     coll = __get_collection()
-    return coll.find_one(attr_dic)
+    dic = coll.find_one(attr_dic)
+    if dic is None: return None
+
+    #found sth
+    user_obj = User.unserialize(dic)
+    return user_obj
 
 
 def save(user_obj,
@@ -103,7 +109,7 @@ def set_passwd(saved_user_obj, new_passwd):
     """
     Sets a new password for a given user object that already exists in the collection
     """
-    passwd_hash = __gen_passwd_hash(new_passwd, saved_user_obj._id)
+    passwd_hash = gen_passwd_hash(new_passwd, saved_user_obj.id())
     saved_user_obj.passwd_hash = passwd_hash
     coll = __get_collection()
     coll.update({'_id': ObjectId(saved_user_obj._id)}, {"$set": saved_user_obj.serialize()}, upsert=False)
@@ -153,6 +159,16 @@ def check_token(user_obj, account_activity, token):
     token for a specific account activity for a user.
     """
     return user_obj.tokens[account_activity] == token
+
+
+def auth(user_obj, given_password):
+    given_pass_hash = gen_passwd_hash(given_password, user_obj.id())
+    return user_obj.passwd_hash == given_pass_hash
+
+
+@login_manager.user_loader
+def load_user(userid):
+    return get(userid)
 
 
 class AccountActivity:

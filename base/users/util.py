@@ -52,7 +52,7 @@ def generate_login_form():
     return form
 
 
-def __gen_passwd_hash(passwd, salt):
+def gen_passwd_hash(passwd, salt):
     key = hashlib.sha1(str(passwd))
     unsalted_key = key.hexdigest()
     unsalted_key += str(salt)
