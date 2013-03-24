@@ -1,6 +1,6 @@
-from base.db import get_mongo
 from base.scheduling.decorator import schedulable
-from campaigns.default_config import MONGO_COLLECTION_NAME
+from bson.objectid import ObjectId
+from campaigns.campaign.model import Campaign
 
 
 def get(campaign_obj_id):
@@ -10,22 +10,15 @@ def get(campaign_obj_id):
     :param campaign_obj_id:
     :return:
     """
-    collection = __get_collection()
+    collection = Campaign.collection()
     if campaign_obj_id is None:
         return collection.find_one()
-    return collection.find_one({"_id": campaign_obj_id})
+    dic = collection.find_one({"_id": ObjectId(str(campaign_obj_id))})
+    return Campaign.unserialize(dic) if dic is not None else None
 
 
 @schedulable
 def save(campaign_obj):
-    col = __get_collection()
+    col = Campaign.collection()
     id = col.insert(campaign_obj.serialize())
     return id
-
-
-def __get_collection(coll=[]):
-    if coll == []:
-        mongo_db = get_mongo()
-        collection = mongo_db[MONGO_COLLECTION_NAME]
-        coll += [collection]
-    return coll[0]

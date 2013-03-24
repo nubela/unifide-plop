@@ -1,8 +1,11 @@
+from base.db import get_mongo
 from base.scheduling.model import SchedulingBase
 
 
 class Campaign(SchedulingBase):
     def __init__(self, **kwargs):
+        super(Campaign, self).__init__()
+
         self.title = None
         self.description = None
         self.picture_url = None
@@ -19,6 +22,10 @@ class Campaign(SchedulingBase):
     @staticmethod
     def unserialize(dic):
         return Campaign(**dic)
+
+    @staticmethod
+    def coll_name():
+        return "campaigns"
 
 
 class CampaignType:

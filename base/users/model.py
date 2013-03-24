@@ -1,4 +1,5 @@
 from base.base_model import Base
+from base.db import get_mongo
 
 
 class User(Base):
@@ -40,7 +41,10 @@ class User(Base):
     def full_name(self):
         return "%s %s" % (self.first_name, self.last_name)
 
-
     @staticmethod
     def unserialize(dic):
         return User(**dic)
+
+    @staticmethod
+    def coll_name():
+        return "users"

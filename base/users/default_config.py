@@ -1,1 +1,0 @@
-USERS_COLLECTION_NAME = "users"
