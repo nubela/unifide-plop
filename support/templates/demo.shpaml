@@ -94,34 +94,27 @@ html
                                 td
                                     > input type="text" placeholder="Your comment here.."
 
-
-
             > hr
 
             div.holder
                 h1 | Events Stream.
                 p.lead | This is a stream of campaigns which are 3 events that are happening soon
+                div#rsvp-modal.modal.hide.fade tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
+                    div.modal-header
+                        button.close type="button" class="close" data-dismiss="modal" aria-hidden="true" | x
+                        h3#myModalLabel | RSVP
+                    div.modal-body
+                        {{rsvp_form|safe}}
                 div.row-fluid
+                    {% for event in events%}
                     div.span4
+                        div.hidden data-campaign-id="{{event._id}}" | &nbsp;
                         > img src="http://lorempixel.com/300/300/?7"
-                        h2 | Title
-                        p | Description
+                        h2 | {{event.title}}
+                        p | {{event.description}}
                         p
-                            button.btn | I'm going
-
-                    div.span4
-                        > img src="http://lorempixel.com/300/300/?8"
-                        h2 | Title
-                        p | Description
-                        p
-                            button.btn | I'm going
-
-                    div.span4
-                        > img src="http://lorempixel.com/300/300/?9"
-                        h2 | Title
-                        p | Description
-                        p
-                            button.btn | I'm going
+                            a.btn.rsvp-modal href="#rsvp-modal" role="button" data-toggle="modal" | I'm going
+                    {% endfor %}
 
         footer.footer
             This is a footer

@@ -1,4 +1,3 @@
-from base.db import get_mongo
 from base.scheduling.model import SchedulingBase
 
 
@@ -14,7 +13,6 @@ class Campaign(SchedulingBase):
 
         #event specific
         self.happening_datetime = None
-        self.rsvped_users_ids = None
 
         for k, v in kwargs.iteritems():
             setattr(self, k, v)

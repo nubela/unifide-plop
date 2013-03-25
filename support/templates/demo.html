@@ -131,40 +131,32 @@
                 </div>
             </div>
 
-
-
             <hr />
 
             <div class="holder">
                 <h1>Events Stream.</h1>
                 <p class="lead">This is a stream of campaigns which are 3 events that are happening soon</p>
+                <div tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" class="modal hide fade" id="rsvp-modal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" class="close">x</button>
+                        <h3 id="myModalLabel">RSVP</h3>
+                    </div>
+                    <div class="modal-body">
+                        {{rsvp_form|safe}}
+                    </div>
+                </div>
                 <div class="row-fluid">
+                    {% for event in events%}
                     <div class="span4">
+                        <div data-campaign-id="{{event._id}}" class="hidden">&nbsp;</div>
                         <img src="http://lorempixel.com/300/300/?7" />
-                        <h2>Title</h2>
-                        <p>Description</p>
+                        <h2>{{event.title}}</h2>
+                        <p>{{event.description}}</p>
                         <p>
-                            <button class="btn">I'm going</button>
+                            <a href="#rsvp-modal" role="button" data-toggle="modal" class="btn rsvp-modal">I'm going</a>
                         </p>
                     </div>
-
-                    <div class="span4">
-                        <img src="http://lorempixel.com/300/300/?8" />
-                        <h2>Title</h2>
-                        <p>Description</p>
-                        <p>
-                            <button class="btn">I'm going</button>
-                        </p>
-                    </div>
-
-                    <div class="span4">
-                        <img src="http://lorempixel.com/300/300/?9" />
-                        <h2>Title</h2>
-                        <p>Description</p>
-                        <p>
-                            <button class="btn">I'm going</button>
-                        </p>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>

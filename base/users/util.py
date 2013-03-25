@@ -89,37 +89,40 @@ class FormType:
     ]
 
     @staticmethod
-    def SUBMIT(text):
-        return FormType(FormType.__SUBMIT, "submit", tag_type="button", input_type="submit", cls="btn", text=text)
+    def SUBMIT(text, **kwargs):
+        return FormType(FormType.__SUBMIT, "submit", tag_type="button", input_type="submit", cls="btn", text=text,
+            **kwargs)
 
     @staticmethod
-    def EMAIL(formid, label=None, placeholder=None, validators=None):
-        return FormType(FormType.__EMAIL, formid, label=label, placeholder=placeholder, validators=validators)
+    def EMAIL(formid, label=None, placeholder=None, validators=None, **kwargs):
+        return FormType(FormType.__EMAIL, formid, label=label, placeholder=placeholder, validators=validators, **kwargs)
 
     @staticmethod
-    def URL(formid, label=None, placeholder=None, validators=None):
-        return FormType(FormType.__URL, formid, label=label, placeholder=placeholder, validators=validators)
+    def URL(formid, label=None, placeholder=None, validators=None, **kwargs):
+        return FormType(FormType.__URL, formid, label=label, placeholder=placeholder, validators=validators, **kwargs)
 
     @staticmethod
-    def DIGIT(formid, label=None, placeholder=None, validators=None):
-        return FormType(FormType.__DIGIT, formid, label=label, placeholder=placeholder, validators=validators)
+    def DIGIT(formid, label=None, placeholder=None, validators=None, **kwargs):
+        return FormType(FormType.__DIGIT, formid, label=label, placeholder=placeholder, validators=validators, **kwargs)
 
     @staticmethod
-    def NUMBER(formid, label=None, placeholder=None, validators=None):
-        return FormType(FormType.__NUMBER, formid, label=label, placeholder=placeholder, validators=validators)
+    def NUMBER(formid, label=None, placeholder=None, validators=None, **kwargs):
+        return FormType(FormType.__NUMBER, formid, label=label, placeholder=placeholder, validators=validators,
+            **kwargs)
 
     @staticmethod
-    def ALPHANUM(formid, label=None, placeholder=None, validators=None):
-        return FormType(FormType.__ALPHANUM, formid, label=label, placeholder=placeholder, validators=validators)
+    def ALPHANUM(formid, label=None, placeholder=None, validators=None, **kwargs):
+        return FormType(FormType.__ALPHANUM, formid, label=label, placeholder=placeholder, validators=validators,
+            **kwargs)
 
     @staticmethod
-    def DATE(formid, label=None, placeholder=None, validators=None):
-        return FormType(FormType.__DATE, formid, label=label, placeholder=placeholder, validators=validators)
+    def DATE(formid, label=None, placeholder=None, validators=None, **kwargs):
+        return FormType(FormType.__DATE, formid, label=label, placeholder=placeholder, validators=validators, **kwargs)
 
     @staticmethod
-    def PASSWORD(formid, label=None, placeholder=None, validators=None):
+    def PASSWORD(formid, label=None, placeholder=None, validators=None, **kwargs):
         return FormType(FormType.__PASSWD, formid, label=label, placeholder=placeholder, validators=validators,
-            input_type="password")
+            input_type="password", **kwargs)
 
     def __init__(self, parsley_type, form_id, input_type=None, label=None, placeholder=None, validators=None,
                  tag_type=None, cls=None, **kwargs):
@@ -131,7 +134,11 @@ class FormType:
         self.validators = validators if validators is not None else []
         self.tag_type = tag_type if tag_type is not None else "input"
         self.cls = cls if cls is not None else ""
-        self.text = kwargs["text"] if "text" in kwargs else ""
+        self.text = ""
+        self.val = ""
+
+        for k, v in kwargs.iteritems():
+            setattr(self, k, v)
 
     def validators_to_string(self):
         """
@@ -161,9 +168,10 @@ class FormType:
                 self.validators_to_string(),
                 )
         else:
-            return "<%s type='%s' class='%s' id='%s' name='%s' placeholder='%s' data-type='%s' %s>" % (
+            return "<%s type='%s' value='%s' class='%s' id='%s' name='%s' placeholder='%s' data-type='%s' %s>" % (
                 self.tag_type,
                 self.input_type,
+                self.val,
                 self.cls,
                 self.form_id,
                 self.form_id,

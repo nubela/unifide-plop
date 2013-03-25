@@ -1,4 +1,5 @@
 import datetime
+import pymongo
 from base.users.util import generate_login_form, generate_form, FormType, FormValidator, get_form_values
 import campaigns
 from base import scheduling, users
@@ -7,13 +8,43 @@ from flask.ext.login import login_user, login_required, logout_user
 from support.app import app
 
 
+def __event_campaigns():
+    return scheduling.get_before(campaigns.Campaign,
+        datetime.datetime.utcnow(),
+        limit=3,
+        sort_args=("happening_datetime", pymongo.DESCENDING),
+        find_param_kwargs={
+            "happening_datetime": {'$ne': None}
+        })
+
+
+def __rsvp_email():
+    rsvp_form = [
+        FormType.EMAIL("rsvp_email",
+            label="Email address",
+            validators=[FormValidator.REQUIRED]
+        ),
+        FormType.SUBMIT("RSVP"),
+    ]
+    return rsvp_form
+
+
 @app.route('/', methods=['GET'])
 def index():
-    c = scheduling.get_before(campaigns.Campaign, datetime.datetime.utcnow())
+    event_campaigns = __event_campaigns()
+    print [x.id() for x in event_campaigns]
+    rsvp_form = __rsvp_email()
+    form = generate_form(rsvp_form, action="/campaign/rsvp/", method="post", id="rsvp-form")
     return render_template("demo.html", **{
-        "campaigns": c,
+        "events": event_campaigns,
+        "rsvp_form": form,
         "is_campaign": True,
     })
+
+
+@app.route('/campaign/rsvp/<campaign_id>/', methods=['POST'])
+def rsvp_campaign(campaign_id):
+    pass
 
 
 @app.route('/login/', methods=['GET', 'POST'])

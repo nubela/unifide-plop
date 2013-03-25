@@ -1,4 +1,4 @@
-from base.scheduling import SchedulingBase
+from base.scheduling.model import SchedulingBase
 
 def schedulable(save_fn):
     def save_schedule_info(obj):

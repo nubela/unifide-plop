@@ -1,3 +1,6 @@
+.hidden {
+  display: none; }
+
 .masthead {
   padding: 120px 0 110px;
   margin-bottom: 0;
