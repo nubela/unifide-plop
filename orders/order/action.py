@@ -10,8 +10,9 @@ def save(user_obj, collection_name, item_id):
     """
     order_obj = Order()
     order_obj.obj_id = item_id
-    order_obj.user_id = user_obj.id
+    order_obj.user_id = user_obj.id()
     order_obj.coll_name = collection_name
+
     id = Order.collection().insert(order_obj.serialize())
     return id
 

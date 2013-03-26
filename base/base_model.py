@@ -2,6 +2,7 @@ import datetime
 from base.db import get_mongo
 from bson.objectid import ObjectId
 
+
 class Base(object):
     def __init__(self):
         self.timestamp_utc = datetime.datetime.utcnow()
@@ -25,12 +26,12 @@ class Base(object):
         pass
 
     @classmethod
-    def collection(cls, coll=[]):
-        if coll == []:
+    def collection(cls, coll={}):
+        if cls.coll_name() not in coll:
             mongo_db = get_mongo()
             collection = mongo_db[cls.coll_name()]
-            coll += [collection]
-        return coll[0]
+            coll[cls.coll_name()] = collection
+        return coll[cls.coll_name()]
 
     @staticmethod
     def coll_name():

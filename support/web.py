@@ -1,4 +1,5 @@
 import datetime
+import orders
 import pymongo
 from base.users.util import generate_login_form, generate_form, FormType, FormValidator, get_form_values
 import campaigns
@@ -18,7 +19,7 @@ def __event_campaigns():
         })
 
 
-def __rsvp_email():
+def __rsvp_email_form():
     rsvp_form = [
         FormType.EMAIL("rsvp_email",
             label="Email address",
@@ -32,8 +33,7 @@ def __rsvp_email():
 @app.route('/', methods=['GET'])
 def index():
     event_campaigns = __event_campaigns()
-    print [x.id() for x in event_campaigns]
-    rsvp_form = __rsvp_email()
+    rsvp_form = __rsvp_email_form()
     form = generate_form(rsvp_form, action="/campaign/rsvp/", method="post", id="rsvp-form")
     return render_template("demo.html", **{
         "events": event_campaigns,
@@ -44,7 +44,17 @@ def index():
 
 @app.route('/campaign/rsvp/<campaign_id>/', methods=['POST'])
 def rsvp_campaign(campaign_id):
-    pass
+    #get form values
+    form_values = get_form_values(request, __rsvp_email_form())
+
+    #create attendee user with only email address
+    user_obj = users.User()
+    user_obj.email = form_values["rsvp_email"]
+    users.save(user_obj)
+
+    #save order
+    order_id = orders.save(user_obj, campaigns.Campaign.coll_name(), campaign_id)
+    return "Saved order with id: %s" % (order_id)
 
 
 @app.route('/login/', methods=['GET', 'POST'])

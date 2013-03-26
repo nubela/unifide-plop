@@ -8,3 +8,5 @@ Some examples are:
 - Item purchases
 - Event RSVP
 """
+from orders.order.action import *
+from orders.order.model import *

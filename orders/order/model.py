@@ -1,5 +1,6 @@
 from base.base_model import Base
-from base.scheduling import SchedulingBase
+from base.scheduling.model import SchedulingBase
+
 
 class StockAvailability(SchedulingBase):
     def __init__(self, **kwargs):
