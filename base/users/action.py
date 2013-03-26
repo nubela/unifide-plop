@@ -1,7 +1,7 @@
 from base import emails
 from base.users.model import User
 from base.users.util import gen_passwd_hash
-from base.util import __gen_uuid
+from base.util import __gen_uuid, coerce_bson_id
 from bson.objectid import ObjectId
 from cfg import DOMAIN
 from support.app import login_manager
@@ -10,7 +10,7 @@ from support.util.template import read_template
 
 def get(user_id):
     coll = User.collection()
-    dic = coll.find_one({"_id": ObjectId(str(user_id))})
+    dic = coll.find_one({"_id": coerce_bson_id(user_id)})
     user_obj = User.unserialize(dic) if dic is not None else None
     return user_obj
 
@@ -25,7 +25,7 @@ def confirm(user_obj):
     """
     coll = User.collection()
     user_obj.account_status = AccountStatus.ENABLED
-    coll.update({'_id': ObjectId(user_obj._id)}, {"$set": user_obj.serialize()}, upsert=False)
+    coll.update({'_id': user_obj.obj_id()}, {"$set": user_obj.serialize()}, upsert=False)
 
 
 def send_confirmation(user_obj, email_subject=None, email_html=None, relative_url=None):
@@ -37,7 +37,7 @@ def send_confirmation(user_obj, email_subject=None, email_html=None, relative_ur
         relative_url = "/register/confirm/"
 
     token = generate_token(user_obj, AccountActivity.VERIFY_EMAIL_ADDR)
-    url = "%s%s%s/%s/" % (DOMAIN, relative_url, user_obj._id, token)
+    url = "%s%s%s/%s/" % (DOMAIN, relative_url, user_obj.id(), token)
     email_html = email_html % {"url": url}
     emails.send_email(user_obj.email, email_subject, email_html, async=False)
 
@@ -47,7 +47,7 @@ def get_user_by_attr(attr_dic):
     dic = coll.find_one(attr_dic)
 
     #found sth
-    user_obj = User.unserialize(dic)  if dic is not None else None
+    user_obj = User.unserialize(dic) if dic is not None else None
     return user_obj
 
 
@@ -75,9 +75,9 @@ def save(user_obj,
     saved_user_obj = save_obj()
     if need_confirmation:
         send_confirmation(saved_user_obj,
-            confirmation_email_subject,
-            confirmation_email_html,
-            relative_url=confirmation_relative_url
+                          confirmation_email_subject,
+                          confirmation_email_html,
+                          relative_url=confirmation_relative_url
         )
 
     return saved_user_obj
@@ -108,7 +108,7 @@ def set_passwd(saved_user_obj, new_passwd):
     passwd_hash = gen_passwd_hash(new_passwd, saved_user_obj.id())
     saved_user_obj.passwd_hash = passwd_hash
     coll = User.collection()
-    coll.update({'_id': ObjectId(saved_user_obj._id)}, {"$set": saved_user_obj.serialize()}, upsert=False)
+    coll.update({'_id': saved_user_obj.obj_id()}, {"$set": saved_user_obj.serialize()}, upsert=False)
     return saved_user_obj
 
 
@@ -123,7 +123,7 @@ def generate_token(user_obj, account_activity):
     user_obj.tokens[account_activity] = __gen_uuid()
 
     coll = User.collection()
-    coll.update({'_id': ObjectId(user_obj._id)}, {"$set": user_obj.serialize()}, upsert=False)
+    coll.update({'_id': user_obj.obj_id()}, {"$set": user_obj.serialize()}, upsert=False)
     return user_obj.tokens[account_activity]
 
 

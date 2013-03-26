@@ -1,4 +1,5 @@
 from base.scheduling.decorator import schedulable
+from base.util import coerce_bson_id
 from bson.objectid import ObjectId
 from campaigns.campaign.model import Campaign
 
@@ -13,7 +14,7 @@ def get(campaign_obj_id):
     collection = Campaign.collection()
     if campaign_obj_id is None:
         return collection.find_one()
-    dic = collection.find_one({"_id": ObjectId(str(campaign_obj_id))})
+    dic = collection.find_one({"_id": coerce_bson_id(campaign_obj_id)})
     return Campaign.unserialize(dic) if dic is not None else None
 
 
