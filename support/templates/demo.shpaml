@@ -43,27 +43,12 @@ html
                 h1 | Promotions Stream.
                 p.lead | This is a stream of the latest 3 promotional campaigns with comments
                 div.row-fluid
-                    div.span4
-                        > img src="http://lorempixel.com/300/300/?4"
-                        h2 | Title
-                        p | Description
-                        table.comment-holder.table-striped.table
-                            tr
-                                td
-                                    span.name | Steven Goh
-                                    span.comment | This is a comment
-                            tr
-                                td
-                                    span.name | Kian Wei
-                                    span.comment | This is a reply
-                            tr
-                                td
-                                    > input type="text" placeholder="Your comment here.."
 
+                    {% for c in commentable %}
                     div.span4
                         > img src="http://lorempixel.com/300/300/?5"
-                        h2 | Title
-                        p | Description
+                        h2 | {{c.0.title}}
+                        p | {{c.0.description}}
                         table.comment-holder.table-striped.table
                             tr
                                 td
@@ -76,23 +61,7 @@ html
                             tr
                                 td
                                     > input type="text" placeholder="Your comment here.."
-
-                    div.span4
-                        > img src="http://lorempixel.com/300/300/?6"
-                        h2 | Title
-                        p | Description
-                        table.comment-holder.table-striped.table
-                            tr
-                                td
-                                    span.name | Steven Goh
-                                    span.comment | This is a comment
-                            tr
-                                td
-                                    span.name | Kian Wei
-                                    span.comment | This is a reply
-                            tr
-                                td
-                                    > input type="text" placeholder="Your comment here.."
+                    {% endfor %}
 
             > hr
 

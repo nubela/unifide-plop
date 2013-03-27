@@ -54,35 +54,12 @@
                 <h1>Promotions Stream.</h1>
                 <p class="lead">This is a stream of the latest 3 promotional campaigns with comments</p>
                 <div class="row-fluid">
-                    <div class="span4">
-                        <img src="http://lorempixel.com/300/300/?4" />
-                        <h2>Title</h2>
-                        <p>Description</p>
-                        <table class="comment-holder table-striped table">
-                            <tr>
-                                <td>
-                                    <span class="name">Steven Goh</span>
-                                    <span class="comment">This is a comment</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="name">Kian Wei</span>
-                                    <span class="comment">This is a reply</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <input type="text" placeholder="Your comment here.." />
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
 
+                    {% for c in commentable %}
                     <div class="span4">
                         <img src="http://lorempixel.com/300/300/?5" />
-                        <h2>Title</h2>
-                        <p>Description</p>
+                        <h2>{{c.0.title}}</h2>
+                        <p>{{c.0.description}}</p>
                         <table class="comment-holder table-striped table">
                             <tr>
                                 <td>
@@ -103,31 +80,7 @@
                             </tr>
                         </table>
                     </div>
-
-                    <div class="span4">
-                        <img src="http://lorempixel.com/300/300/?6" />
-                        <h2>Title</h2>
-                        <p>Description</p>
-                        <table class="comment-holder table-striped table">
-                            <tr>
-                                <td>
-                                    <span class="name">Steven Goh</span>
-                                    <span class="comment">This is a comment</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="name">Kian Wei</span>
-                                    <span class="comment">This is a reply</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <input type="text" placeholder="Your comment here.." />
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
 

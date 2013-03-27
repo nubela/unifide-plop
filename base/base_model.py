@@ -1,5 +1,6 @@
 import datetime
 from base.db import get_mongo
+from base.util import coerce_bson_id
 from bson.objectid import ObjectId
 
 
@@ -15,7 +16,8 @@ class Base(object):
         """
         for pymongo parsing
         """
-        return ObjectId(str(self._id))
+        print "works"
+        return coerce_bson_id(self._id)
 
     def serialize(self):
         banned_keys = ["_id", ]
