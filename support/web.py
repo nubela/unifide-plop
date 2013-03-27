@@ -1,4 +1,5 @@
 import datetime
+import comments
 import orders
 import pymongo
 from base.users.util import generate_login_form, generate_form, FormType, FormValidator, get_form_values
@@ -11,19 +12,19 @@ from support.app import app, login_manager
 
 def __event_campaigns():
     return scheduling.get_before(campaigns.Campaign,
-        datetime.datetime.utcnow(),
-        limit=3,
-        sort_args=("happening_datetime", pymongo.DESCENDING),
-        find_param_kwargs={
-            "happening_datetime": {'$ne': None}
-        })
+                                 datetime.datetime.utcnow(),
+                                 limit=3,
+                                 sort_args=("happening_datetime", pymongo.DESCENDING),
+                                 find_param_kwargs={
+                                     "happening_datetime": {'$ne': None}
+                                 })
 
 
 def __rsvp_email_form():
     rsvp_form = [
         FormType.EMAIL("rsvp_email",
-            label="Email address",
-            validators=[FormValidator.REQUIRED]
+                       label="Email address",
+                       validators=[FormValidator.REQUIRED]
         ),
         FormType.SUBMIT("RSVP"),
     ]
@@ -32,10 +33,18 @@ def __rsvp_email_form():
 
 @app.route('/', methods=['GET'])
 def index():
+    #commentable campaigns
+    commentable_campaigns = scheduling.get_before(campaigns.Campaign, limit=3)
+    campaign_w_comments = [(x, comments.get_all(x.obj_id(), campaigns.Campaign.coll_name(), limit=3))
+                           for x in commentable_campaigns]
+
+    #event campaigns
     event_campaigns = __event_campaigns()
     rsvp_form = __rsvp_email_form()
     form = generate_form(rsvp_form, action="/campaign/rsvp/", method="post", id="rsvp-form")
+
     return render_template("demo.html", **{
+        "commentable": campaign_w_comments,
         "events": event_campaigns,
         "rsvp_form": form,
         "is_campaign": True,
@@ -142,8 +151,8 @@ def register():
                     }]
         }):
             user_obj = users.save(user_obj, need_confirmation=True,
-                confirmation_email_subject="Complete your account registration",
-                confirmation_relative_url="/register/confirm/")
+                                  confirmation_email_subject="Complete your account registration",
+                                  confirmation_relative_url="/register/confirm/")
             users.set_passwd(user_obj, values["password"])
             return "Saved!"
         return "Already registered."
@@ -206,8 +215,8 @@ def reset_password(user_id, token):
 def __forgot_passwd_form():
     return [
         FormType.EMAIL("email",
-            label="What is your email address?",
-            validators=[FormValidator.REQUIRED]
+                       label="What is your email address?",
+                       validators=[FormValidator.REQUIRED]
         )
     ]
 

@@ -1,6 +1,7 @@
 import datetime
 from base import scheduling
 from base.scheduling.decorator import schedulable
+from base.util import coerce_bson_id
 from bson.objectid import ObjectId
 from orders.order.model import Order, StockAvailability
 
@@ -9,8 +10,8 @@ def save(user_obj, collection_name, item_id):
     Confirms and saves an order of an item
     """
     order_obj = Order()
-    order_obj.obj_id = item_id
-    order_obj.user_id = user_obj.id()
+    order_obj.obj_id = coerce_bson_id(item_id)
+    order_obj.user_id = user_obj.obj_id()
     order_obj.coll_name = collection_name
 
     id = Order.collection().insert(order_obj.serialize())
@@ -22,8 +23,8 @@ def remove(user_obj, collection_name, item_id):
     Removes an order of an item
     """
     order_obj = get_order_by_attr(**{
-        "obj_id": item_id,
-        "user_id": user_obj.id,
+        "obj_id": coerce_bson_id(item_id),
+        "user_id": user_obj.obj_id(),
         "collection_name": collection_name,
     })
     Order.collection().remove({
@@ -36,7 +37,7 @@ def get(order_id):
     Gets an order object given its id
     """
     dic = Order.collection().find_one({
-        "_id": ObjectId(str(order_id))
+        "_id": coerce_bson_id(order_id),
     })
     return Order.unserialize(dic) if dic is not None else None
 
@@ -49,7 +50,7 @@ def get_order_by_attr(**kwargs):
 @schedulable
 def set_availability(obj_id, collection_name, stock_quantity, publish_datetime):
     stock = StockAvailability()
-    stock.obj_id = obj_id
+    stock.obj_id = coerce_bson_id(obj_id)
     stock.coll_name = collection_name
     stock.availability = stock_quantity
     stock.publish_datetime_utc = publish_datetime

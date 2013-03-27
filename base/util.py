@@ -3,6 +3,12 @@ from datetime import datetime
 import time
 from cfg import ASSETS_FOLDER
 import os
+from bson import ObjectId
+
+
+def coerce_bson_id(str_id):
+    return ObjectId(str(str_id))
+
 
 def __gen_uuid():
     return str(uuid.uuid1())
