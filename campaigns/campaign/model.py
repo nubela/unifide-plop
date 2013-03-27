@@ -19,6 +19,7 @@ class Campaign(SchedulingBase):
 
     @staticmethod
     def unserialize(dic):
+        print dic
         return Campaign(**dic)
 
     @staticmethod
