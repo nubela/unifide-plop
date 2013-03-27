@@ -16,7 +16,7 @@ def comment(user_obj, comment_str, obj_id, coll_name):
     comment_obj = Comment()
     comment_obj.user_id = user_obj.obj_id()
     comment_obj.comment = comment_str
-    comment_str.coll_name = coll_name
+    comment_obj.coll_name = coll_name
     comment_obj.obj_id = coerce_bson_id(obj_id)
     return save(comment_obj)
 

@@ -43,25 +43,30 @@ html
                 h1 | Promotions Stream.
                 p.lead | This is a stream of the latest 3 promotional campaigns with comments
                 div.row-fluid
-
                     {% for c in commentable %}
                     div.span4
                         > img src="http://lorempixel.com/300/300/?5"
                         h2 | {{c.0.title}}
                         p | {{c.0.description}}
                         table.comment-holder.table-striped.table
+                            {% for comment in c.1 %}
                             tr
                                 td
-                                    span.name | Steven Goh
-                                    span.comment | This is a comment
+                                    span.name | {{comment.0}}
+                                    span.comment | {{comment.1}}
+                            {% endfor %}
                             tr
                                 td
-                                    span.name | Kian Wei
-                                    span.comment | This is a reply
-                            tr
-                                td
-                                    > input type="text" placeholder="Your comment here.."
+                                    form.commentForm action="/campaign/comment/{{c.0._id}}/" method="post"
+                                        > input.commentInput type="text" placeholder="Your comment here.." name="comment"
+                                        > input.commentUserName type="hidden" name="name"
                     {% endfor %}
+                    div#comment-modal.modal.hide.fade tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
+                        div.modal-header
+                            button.close type="button" class="close" data-dismiss="modal" aria-hidden="true" | x
+                            h3#myModalLabel | What's your name?
+                        div.modal-body
+                            {{comment_name_form|safe}}
 
             > hr
 

@@ -12,19 +12,29 @@ from support.app import app, login_manager
 
 def __event_campaigns():
     return scheduling.get_before(campaigns.Campaign,
-                                 datetime.datetime.utcnow(),
-                                 limit=3,
-                                 sort_args=("happening_datetime", pymongo.DESCENDING),
-                                 find_param_kwargs={
-                                     "happening_datetime": {'$ne': None}
-                                 })
+        datetime.datetime.utcnow(),
+        limit=3,
+        sort_args=("happening_datetime", pymongo.DESCENDING),
+        find_param_kwargs={
+            "happening_datetime": {'$ne': None}
+        })
+
+
+def __comment_name_form():
+    comment_form = [
+        FormType.ALPHANUM("name",
+            label="Name"
+        ),
+        FormType.SUBMIT("Comment"),
+    ]
+    return comment_form
 
 
 def __rsvp_email_form():
     rsvp_form = [
         FormType.EMAIL("rsvp_email",
-                       label="Email address",
-                       validators=[FormValidator.REQUIRED]
+            label="Email address",
+            validators=[FormValidator.REQUIRED]
         ),
         FormType.SUBMIT("RSVP"),
     ]
@@ -37,6 +47,17 @@ def index():
     commentable_campaigns = scheduling.get_before(campaigns.Campaign, limit=3)
     campaign_w_comments = [(x, comments.get_all(x.obj_id(), campaigns.Campaign.coll_name(), limit=3))
                            for x in commentable_campaigns]
+    verbose_campaign_comments = []
+    for campaign in campaign_w_comments:
+        campaign_obj = campaign[0]
+        comment_obj = campaign[1]
+        lis_of_comments = []
+        for c in comment_obj:
+            comment_str = c.comment
+            commentee_user = users.get(c.user_id)
+            lis_of_comments += [(commentee_user.first_name, comment_str)]
+        verbose_campaign_comments += [(campaign_obj, lis_of_comments)]
+    comment_name_form = generate_form(__comment_name_form(), id="comment-name-form")
 
     #event campaigns
     event_campaigns = __event_campaigns()
@@ -44,11 +65,26 @@ def index():
     form = generate_form(rsvp_form, action="/campaign/rsvp/", method="post", id="rsvp-form")
 
     return render_template("demo.html", **{
-        "commentable": campaign_w_comments,
+        "commentable": verbose_campaign_comments,
+        "comment_name_form": comment_name_form,
         "events": event_campaigns,
         "rsvp_form": form,
         "is_campaign": True,
     })
+
+
+@app.route('/campaign/comment/<campaign_id>/', methods=['POST'])
+def add_comment(campaign_id):
+    name = request.form.get("name")
+    comment = request.form.get("comment")
+
+    #spawn anonymous user
+    user_obj = users.User()
+    user_obj.first_name = name;
+    users.save(user_obj)
+
+    id = comments.comment(user_obj, comment, campaign_id, campaigns.Campaign.coll_name())
+    return "Saved comment: %s" % (str(id))
 
 
 @app.route('/campaign/rsvp/<campaign_id>/', methods=['POST'])
@@ -151,8 +187,8 @@ def register():
                     }]
         }):
             user_obj = users.save(user_obj, need_confirmation=True,
-                                  confirmation_email_subject="Complete your account registration",
-                                  confirmation_relative_url="/register/confirm/")
+                confirmation_email_subject="Complete your account registration",
+                confirmation_relative_url="/register/confirm/")
             users.set_passwd(user_obj, values["password"])
             return "Saved!"
         return "Already registered."
@@ -189,7 +225,6 @@ def __passwd_reset_form():
 
 @app.route('/user/reset-password/<user_id>/<token>/', methods=['GET', 'POST'])
 def reset_password(user_id, token):
-    print user_id
     user_obj = users.get(user_id)
     if users.check_token(user_obj, users.AccountActivity.RESET_PASSWORD, token):
         #show passwd reset form
@@ -215,8 +250,8 @@ def reset_password(user_id, token):
 def __forgot_passwd_form():
     return [
         FormType.EMAIL("email",
-                       label="What is your email address?",
-                       validators=[FormValidator.REQUIRED]
+            label="What is your email address?",
+            validators=[FormValidator.REQUIRED]
         )
     ]
 
@@ -237,7 +272,6 @@ def forgot_password():
         user_obj = users.get_user_by_attr({"email": form_values["email"]})
         users.send_reset_passwd_notice(user_obj)
         return "Check your email"
-
 
 
 @login_manager.user_loader

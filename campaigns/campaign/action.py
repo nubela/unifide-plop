@@ -1,6 +1,5 @@
 from base.scheduling.decorator import schedulable
 from base.util import coerce_bson_id
-from bson.objectid import ObjectId
 from campaigns.campaign.model import Campaign
 
 

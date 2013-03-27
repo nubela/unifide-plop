@@ -54,33 +54,40 @@
                 <h1>Promotions Stream.</h1>
                 <p class="lead">This is a stream of the latest 3 promotional campaigns with comments</p>
                 <div class="row-fluid">
-
                     {% for c in commentable %}
                     <div class="span4">
                         <img src="http://lorempixel.com/300/300/?5" />
                         <h2>{{c.0.title}}</h2>
                         <p>{{c.0.description}}</p>
                         <table class="comment-holder table-striped table">
+                            {% for comment in c.1 %}
                             <tr>
                                 <td>
-                                    <span class="name">Steven Goh</span>
-                                    <span class="comment">This is a comment</span>
+                                    <span class="name">{{comment.0}}</span>
+                                    <span class="comment">{{comment.1}}</span>
                                 </td>
                             </tr>
+                            {% endfor %}
                             <tr>
                                 <td>
-                                    <span class="name">Kian Wei</span>
-                                    <span class="comment">This is a reply</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <input type="text" placeholder="Your comment here.." />
+                                    <form action="/campaign/comment/{{c.0._id}}/" method="post" class="commentForm">
+                                        <input type="text" placeholder="Your comment here.." name="comment" class="commentInput" />
+                                        <input type="hidden" name="name" class="commentUserName" />
+                                    </form>
                                 </td>
                             </tr>
                         </table>
                     </div>
                     {% endfor %}
+                    <div tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" class="modal hide fade" id="comment-modal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" class="close">x</button>
+                            <h3 id="myModalLabel">What's your name?</h3>
+                        </div>
+                        <div class="modal-body">
+                            {{comment_name_form|safe}}
+                        </div>
+                    </div>
                 </div>
             </div>
 
