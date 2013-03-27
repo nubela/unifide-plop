@@ -1,0 +1,3 @@
+html
+    body
+        Click <a href="%(url)s">here</a> to complete your registration of account.

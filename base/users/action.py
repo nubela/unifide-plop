@@ -1,11 +1,9 @@
 from base import emails
 from base.users.model import User
 from base.users.util import gen_passwd_hash
-from base.util import __gen_uuid
+from base.util import __gen_uuid, read_template
 from bson.objectid import ObjectId
 from cfg import DOMAIN
-from support.app import login_manager
-from support.util.template import read_template
 
 
 def get(user_id):
@@ -32,7 +30,7 @@ def send_confirmation(user_obj, email_subject=None, email_html=None, relative_ur
     if email_subject is None:
         email_subject = "Complete your account registration"
     if email_html is None:
-        email_html = read_template("emails/verify_email.html")
+        email_html = read_template("email/verify_email.html")
     if relative_url is None:
         relative_url = "/register/confirm/"
 
@@ -91,7 +89,7 @@ def send_reset_passwd_notice(user_obj, email_subj=None, email_html=None, relativ
     if email_subj is None:
         email_subj = "Password Reset"
     if email_html is None:
-        email_html = read_template("emails/reset_passwd.html")
+        email_html = read_template("email/reset_passwd.html")
     if relative_url is None:
         relative_url = "/user/reset-password/"
 
@@ -160,11 +158,6 @@ def check_token(user_obj, account_activity, token):
 def auth(user_obj, given_password):
     given_pass_hash = gen_passwd_hash(given_password, user_obj.id())
     return user_obj.passwd_hash == given_pass_hash
-
-
-@login_manager.user_loader
-def load_user(userid):
-    return get(userid)
 
 
 class AccountActivity:

@@ -6,7 +6,7 @@ import campaigns
 from base import scheduling, users
 from flask import render_template, request
 from flask.ext.login import login_user, login_required, logout_user
-from support.app import app
+from support.app import app, login_manager
 
 
 def __event_campaigns():
@@ -228,6 +228,12 @@ def forgot_password():
         user_obj = users.get_user_by_attr({"email": form_values["email"]})
         users.send_reset_passwd_notice(user_obj)
         return "Check your email"
+
+
+
+@login_manager.user_loader
+def load_user(userid):
+    return users.get(userid)
 
 
 @app.route('/test-login/', methods=['GET'])
