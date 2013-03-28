@@ -10,6 +10,11 @@ from flask.ext.login import login_user, login_required, logout_user
 from support.app import app, login_manager
 
 
+@app.route('/showcase/', methods=['GET'])
+def showcase():
+    return render_template("showcase.html")
+
+
 @app.route('/blog/', methods=['GET'])
 def blog():
     return render_template("blog.html")

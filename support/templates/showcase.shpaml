@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+html
+    head
+        title | Blog
+        {% include "includes/imports.html" %}
+
+    body
+        {% include "includes/navbar.html" %}
+        div.topPadding | &nbsp;
+        div.container
+            div.row-fluid
+                pass
