@@ -8,9 +8,9 @@ div.navbar.navbar-inverse.navbar-fixed-top
                 li
                     a href="/showcase/" | Items
                 li
-                    a href="/keep-gom-alive/" | Blog
+                    a href="/blog/" | Blog
                 li
-                    a href="/keep-gom-alive/" | Business
+                    a href="/biz/" | Business
                 li
                     a href="/keep-gom-alive/" | Control Panel
             ul.nav.pull-right
