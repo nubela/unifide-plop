@@ -2,19 +2,23 @@
   display: none; }
 
 .masthead {
+  padding: 70px 0 40px;
+  color: white; }
+
+.special {
   padding: 120px 0 110px;
   margin-bottom: 0;
   color: white;
   text-align: center; }
-  .masthead h1 {
+  .special h1 {
     font-size: 120px;
     line-height: 1;
     letter-spacing: -2px; }
-  .masthead p.lead {
+  .special p.lead {
     font-size: 40px;
     font-weight: 200;
     line-height: 1.25; }
-  .masthead .btn {
+  .special .btn {
     padding: 19px 24px;
     font-size: 24px;
     font-weight: 200;
@@ -89,3 +93,6 @@ hr {
 
 .topPadding {
   padding-top: 120px; }
+
+.thumbnails-holder {
+  padding-top: 50px; }

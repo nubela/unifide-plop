@@ -4,7 +4,7 @@ import orders
 import pymongo
 from base.users.util import generate_login_form, generate_form, FormType, FormValidator, get_form_values
 import campaigns
-from base import scheduling, users
+from base import scheduling, users, items
 from flask import render_template, request
 from flask.ext.login import login_user, login_required, logout_user
 from support.app import app, login_manager
@@ -12,7 +12,14 @@ from support.app import app, login_manager
 
 @app.route('/showcase/', methods=['GET'])
 def showcase():
-    return render_template("showcase.html")
+    #get menu items
+    menu_path = ["Menu", "Food", "Mains"]
+    all_items = items.get_all(items.container_from_path(menu_path))
+
+    return render_template("showcase.html",
+        **{
+            "items": all_items,
+        })
 
 
 @app.route('/blog/', methods=['GET'])

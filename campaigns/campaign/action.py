@@ -12,7 +12,7 @@ def get(campaign_obj_id):
     """
     collection = Campaign.collection()
     if campaign_obj_id is None:
-        return collection.find_one()
+        return None
     dic = collection.find_one({"_id": coerce_bson_id(campaign_obj_id)})
     return Campaign.unserialize(dic) if dic is not None else None
 

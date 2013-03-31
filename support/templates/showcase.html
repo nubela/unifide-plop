@@ -1,17 +1,30 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Blog</title>
+        <title>Showcase</title>
         {% include "includes/imports.html" %}
     </head>
 
     <body>
         {% include "includes/navbar.html" %}
-        <div class="topPadding">&nbsp;</div>
-        <div class="container">
-            <div class="row-fluid">
-                pass
+        <div class="jumbotron masthead">
+            <div class="container">
+                <h1>Item Showcase</h1>
+                <p class="lead">This page demonstrates item information management, be it menu items, retail products or branch information.</p>
             </div>
+        </div>
+        <div class="container">
+            {% for item in items %}
+            {% if loop.index0 is divisibleby 3 %}<div class="row-fluid thumbnails-holder"><ul class="thumbnails">{% endif %}
+                <li class="span4">
+                    <div class="thumbnail">
+                        <img src="http://lorempixel.com/300/300/" />
+                        <h3>{{item.name}}</h3>
+                        <p>{{item.description|truncate(200)}}</p>
+                    </div>
+                </li>
+            {% if (loop.index0 + 1) is divisibleby 3 %}</ul></div>{% endif %}
+            {% endfor %}
         </div>
     </body>
 </html>

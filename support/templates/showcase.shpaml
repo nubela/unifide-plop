@@ -1,12 +1,22 @@
 <!DOCTYPE html>
 html
     head
-        title | Blog
+        title | Showcase
         {% include "includes/imports.html" %}
 
     body
         {% include "includes/navbar.html" %}
-        div.topPadding | &nbsp;
+        div.jumbotron.masthead
+            .container
+                h1 | Item Showcase
+                p.lead | This page demonstrates item information management, be it menu items, retail products or branch information.
         div.container
-            div.row-fluid
-                pass
+            {% for item in items %}
+            {% if loop.index0 is divisibleby 3 %}<div class="row-fluid thumbnails-holder"><ul class="thumbnails">{% endif %}
+                li.span4
+                    div.thumbnail
+                        > img src="http://lorempixel.com/300/300/"
+                        h3 | {{item.name}}
+                        p | {{item.description|truncate(200)}}
+            {% if (loop.index0 + 1) is divisibleby 3 %}</ul></div>{% endif %}
+            {% endfor %}

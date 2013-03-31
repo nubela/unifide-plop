@@ -6,7 +6,7 @@ html
 
     body
         {% include "includes/navbar.html" %}
-        div.jumbotron.masthead
+        div.jumbotron.masthead.special
             .container
                 h1 | A Unifide Demo
                 p.lead | To demonstrate the customisability and cohesion of the Unifide platform
