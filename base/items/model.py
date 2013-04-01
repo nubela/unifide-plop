@@ -1,4 +1,5 @@
 from base.base_model import Base
+from base.scheduling.model import SchedulingBase
 
 
 class Container(Base):
@@ -26,7 +27,7 @@ class Container(Base):
         return "containers"
 
 
-class Item(Base):
+class Item(SchedulingBase):
     INCLUDED_FIELDS = ["name", "image", "description", "price"]
     META_FIELDS = ["slug_name", "container_id", "status", "custom_attr_lis"]
 

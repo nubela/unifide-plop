@@ -3,7 +3,7 @@ from base.base_model import Base
 class SchedulingBase(Base):
     def __init__(self):
         super(SchedulingBase, self).__init__()
-        self.publish_datetime_utc = None
+        self.publish_datetime = None #in utc
 
     def schedule_serialize(self, obj_id):
         dic = {

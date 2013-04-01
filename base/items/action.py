@@ -1,8 +1,11 @@
 #--- item functions ---
+import datetime
 from base.items.model import Item, Container, ItemStatus
+from base.scheduling.decorator import schedulable
 from base.util import coerce_bson_id
 import re
 import unidecode
+
 
 def get(item_id):
     """
@@ -75,13 +78,14 @@ def move(item_obj, new_path_lis):
     pass
 
 
+@schedulable
 def save(item_obj):
     col = Item.collection()
     id = col.insert(item_obj.serialize())
     return id
 
 
-def save_item(attr_dic, path_lis):
+def save_item(attr_dic, path_lis, publish_datetime=None):
     """
     Shortcut function to creating an item object.
     Returns item object.
@@ -89,6 +93,8 @@ def save_item(attr_dic, path_lis):
     container_obj = container_from_path(path_lis)
     if container_obj:
         container_obj = save_container_path(path_lis)
+    if publish_datetime is None:
+        publish_datetime = datetime.datetime.utcnow()
 
     #custom attr
     fields = Item.INCLUDED_FIELDS + Item.META_FIELDS
@@ -96,6 +102,7 @@ def save_item(attr_dic, path_lis):
     not_part_of_fields = [x for x in keys if x not in fields]
 
     item_obj = Item(**attr_dic)
+    item_obj.publish_datetime = publish_datetime
     item_obj.container_id = container_obj.obj_id()
     item_obj.slug_name = slugify_item_name(item_obj)
     item_obj.status = ItemStatus.VISIBLE
@@ -158,15 +165,25 @@ def container_from_path(path):
     return Container.unserialize(dic) if dic is not None else None
 
 
-def get_all(container_obj):
+def get_all(container_obj, find_param_lis=None, limit=None):
     """
     Get all items objects in a list given a container object.
 
     :param container_obj:
     :return list_of_items:
     """
+    if find_param_lis is None:
+        find_param_lis = []
+    if limit is None:
+        limit = 5
+
     coll = Item.collection()
     lis_of_dic = coll.find({"container_id": container_obj.obj_id()})
+    lis_of_dic = coll.find({
+        "$and": [
+                    {"container_id": container_obj.obj_id()}
+                ] + find_param_lis,
+    }, limit=limit)
     return [Item.unserialize(x) for x in lis_of_dic]
 
 

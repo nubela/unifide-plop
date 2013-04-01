@@ -1,4 +1,5 @@
 import datetime
+import articles
 import comments
 import orders
 import pymongo
@@ -24,7 +25,12 @@ def showcase():
 
 @app.route('/blog/', methods=['GET'])
 def blog():
-    return render_template("blog.html")
+    published = scheduling.sort_desc(articles.get_published_articles(limit=5))
+
+    return render_template("blog.html",
+        **{
+            "articles": published,
+        })
 
 
 def __event_campaigns():
@@ -32,9 +38,9 @@ def __event_campaigns():
         datetime.datetime.utcnow(),
         limit=3,
         sort_args=("happening_datetime", pymongo.DESCENDING),
-        find_param_kwargs={
-            "happening_datetime": {'$ne': None}
-        })
+        find_param_lis=[{
+                            "happening_datetime": {'$ne': None}
+                        }])
 
 
 def __comment_name_form():
