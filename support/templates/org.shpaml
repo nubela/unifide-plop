@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+html
+    head
+        title | Showcase
+        {% include "includes/imports.html" %}
+
+    body
+        {% include "includes/navbar.html" %}
+        div.jumbotron.masthead
+            .container
+                h1 | Business Information
+                p.lead | Manage info from your control panel and have them pushed out to all channels instantly.
+        div.container
+            div.page-header
+                h2 | Business name
+            p | {{name}}
+
+            div.page-header
+                h2 | Business Description
+            p | {{description}}
+
+            div.page-header
+                h2 | Contact Email
+            p | {{email}}
+
+            div.page-header
+                h2 | Address
+            p | {{address}}

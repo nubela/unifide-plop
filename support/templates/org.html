@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Showcase</title>
+        {% include "includes/imports.html" %}
+    </head>
+
+    <body>
+        {% include "includes/navbar.html" %}
+        <div class="jumbotron masthead">
+            <div class="container">
+                <h1>Business Information</h1>
+                <p class="lead">Manage info from your control panel and have them pushed out to all channels instantly.</p>
+            </div>
+        </div>
+        <div class="container">
+            <div class="page-header">
+                <h2>Business name</h2>
+            </div>
+            <p>{{name}}</p>
+
+            <div class="page-header">
+                <h2>Business Description</h2>
+            </div>
+            <p>{{description}}</p>
+
+            <div class="page-header">
+                <h2>Contact Email</h2>
+            </div>
+            <p>{{email}}</p>
+
+            <div class="page-header">
+                <h2>Address</h2>
+            </div>
+            <p>{{address}}</p>
+        </div>
+    </body>
+</html>

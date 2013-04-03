@@ -5,10 +5,17 @@ import orders
 import pymongo
 from base.users.util import generate_login_form, generate_form, FormType, FormValidator, get_form_values
 import campaigns
-from base import scheduling, users, items
+from base import scheduling, users, items, org
 from flask import render_template, request
 from flask.ext.login import login_user, login_required, logout_user
 from support.app import app, login_manager
+
+@app.route('/biz/', methods=['GET'])
+def biz_info():
+    biz_info = org.get()
+    print vars(biz_info)
+    return render_template("org.html",
+        **vars(biz_info))
 
 
 @app.route('/showcase/', methods=['GET'])

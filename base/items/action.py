@@ -78,6 +78,10 @@ def move(item_obj, new_path_lis):
     pass
 
 
+def update(item_obj):
+    pass
+
+
 @schedulable
 def save(item_obj):
     col = Item.collection()
