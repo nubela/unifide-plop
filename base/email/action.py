@@ -1,7 +1,7 @@
 import smtplib
 from email.mime.text import MIMEText
 from threading import Thread
-from base.emails.default_config import GMAIL_USERNAME, GMAIL_PASSWD, GMAIL_NAME
+from base.email.default_config import GMAIL_USERNAME, GMAIL_PASSWD, GMAIL_NAME
 
 
 GMAIL_SMTP_SERVER = 'smtp.gmail.com:587'

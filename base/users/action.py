@@ -1,4 +1,4 @@
-from base import emails
+from base import email
 from base.users.model import User
 from base.users.util import gen_passwd_hash
 from base.util import coerce_bson_id, read_template, __gen_uuid
@@ -37,7 +37,7 @@ def send_confirmation(user_obj, email_subject=None, email_html=None, relative_ur
     token = generate_token(user_obj, AccountActivity.VERIFY_EMAIL_ADDR)
     url = "%s%s%s/%s/" % (DOMAIN, relative_url, user_obj.id(), token)
     email_html = email_html % {"url": url}
-    emails.send_email(user_obj.email, email_subject, email_html, async=False)
+    email.send_email(user_obj.email, email_subject, email_html, async=False)
 
 
 def get_user_by_attr(attr_dic):
@@ -96,7 +96,7 @@ def send_reset_passwd_notice(user_obj, email_subj=None, email_html=None, relativ
     token = generate_token(user_obj, AccountActivity.RESET_PASSWORD)
     url = "%s%s%s/%s/" % (DOMAIN, relative_url, user_obj.id(), token)
     email_html = email_html % {"url": url}
-    emails.send_email(user_obj.email, email_subj, email_html)
+    email.send_email(user_obj.email, email_subj, email_html)
 
 
 def set_passwd(saved_user_obj, new_passwd):
