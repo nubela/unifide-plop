@@ -5,8 +5,9 @@ class Image(Base):
         super(Image, self).__init__()
 
         self.file_name = None
-        self.url = None
         self.storage = None
+        self.width = None
+        self.height = None
 
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
