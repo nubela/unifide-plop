@@ -12,11 +12,9 @@ class Image(Base):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
 
-
     @staticmethod
     def unserialize(dic):
         return Image(**dic)
-
 
     @staticmethod
     def coll_name():
