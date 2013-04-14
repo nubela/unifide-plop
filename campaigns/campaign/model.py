@@ -1,10 +1,11 @@
-from base.scheduling.model import SchedulingBase
+from base.base_model import Base
 
 
-class Campaign(SchedulingBase):
+class Campaign(Base):
     def __init__(self, **kwargs):
         super(Campaign, self).__init__()
 
+        self.uid = None
         self.title = None
         self.description = None
         self.picture_url = None

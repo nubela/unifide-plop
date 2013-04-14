@@ -1,4 +1,3 @@
-from base.scheduling.decorator import schedulable
 from base.util import coerce_bson_id
 from campaigns.campaign.model import Campaign
 
@@ -17,7 +16,6 @@ def get(campaign_obj_id):
     return Campaign.unserialize(dic) if dic is not None else None
 
 
-@schedulable
 def save(campaign_obj):
     col = Campaign.collection()
     id = col.insert(campaign_obj.serialize())
