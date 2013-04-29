@@ -1,11 +1,14 @@
 from base.base_model import Base
 
-class Image(Base):
+class Media(Base):
     def __init__(self, **kwargs):
-        super(Image, self).__init__()
+        super(Media, self).__init__()
 
         self.file_name = None
         self.storage = None
+        self.file_type = None
+
+        #image meta
         self.width = None
         self.height = None
 
@@ -15,9 +18,9 @@ class Image(Base):
 
     @staticmethod
     def unserialize(dic):
-        return Image(**dic)
+        return Media(**dic)
 
 
     @staticmethod
     def coll_name():
-        return "images"
+        return "media"

@@ -1,32 +1,44 @@
+import imghdr
 import urllib
 from decimal import Decimal
 from PIL import ExifTags
 import os
 from base import S3
 from base.S3 import S3Object
-from base.image.model import Image
+from base.media.model import Media
 from base.util import __gen_uuid, coerce_bson_id
 from cfg import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, S3_BUCKET_NAME, UPLOAD_FOLDER, CLOUDFRONT_URL, DOMAIN, UPLOAD_RELATIVE_ENDPOINT
 import Image as PILImage
 
-def save(img_obj):
-    col = Image.collection()
-    id = col.insert(img_obj.serialize())
+
+def is_image(media_stream):
+    ext = imghdr.what(None, media_stream.read())
+    return ext in ["jpg", "gif", "png"]
+
+
+def save(media_obj):
+    col = Media.collection()
+    id = col.insert(media_obj.serialize())
     return id
 
 
-def __store_locally(filename, img_stream):
+def __store_locally(filename, file_stream, is_img=False):
     #save it to disk
     file_path = os.path.join(UPLOAD_FOLDER, filename)
     f = open(file_path, 'wb+')
-    f.write(img_stream.read())
+    f.write(file_stream.read())
     f.close()
 
+    print file_stream.read()
+
     #fix img mode
-    img = PILImage.open(file_path)
-    if img.mode != 'RGB': # Fix IOError: cannot write mode P as PPM
-        img = img.convert('RGB')
-        img.save(file_path, "JPEG")
+    if is_img:
+        img = PILImage.open(file_path)
+        if img.mode != 'RGB': # Fix IOError: cannot write mode P as PPM
+            img = img.convert('RGB')
+            img.save(file_path, "JPEG")
+
+    return file_path
 
 
 def __store_s3(filename, img_stream):
@@ -36,20 +48,48 @@ def __store_s3(filename, img_stream):
 
 
 def __new_img_obj(filename, height, storage, width):
-    img_obj = Image()
+    img_obj = Media()
     img_obj.file_name = filename
     img_obj.storage = storage
     img_obj.width = width
     img_obj.height = height
-    save(img_obj)
+    img_obj.file_type = MediaType.IMAGE
+    img_obj._id = save(img_obj)
     return img_obj
 
 
+def save_media(media_stream, storage=None):
+    if storage is None:
+        storage = MediaStorage.LOCAL
+
+    #store binary
+    filename = __gen_uuid()
+    file_path = __store_locally(filename, media_stream)
+    if storage == MediaStorage.S3:
+        __store_s3(filename, media_stream)
+
+    #save document record
+    media_obj = Media()
+    media_obj.file_name = filename
+    media_obj.storage = storage
+    media_obj.file_type = MediaType.OTHERS
+    media_obj._id = save(media_obj)
+
+    #cleanup
+    if storage != MediaStorage.LOCAL:
+        os.remove(file_path)
+
+    return media_obj
+
+
 def save_image(image_stream, storage=None):
+    if storage is None:
+        storage = MediaStorage.LOCAL
+
     #store binary
     filename = __gen_uuid()
     file_path = __store_locally(filename, image_stream)
-    if storage == ImageStorage.S3:
+    if storage == MediaStorage.S3:
         __store_s3(filename, image_stream)
 
     #get pil img obj
@@ -57,10 +97,10 @@ def save_image(image_stream, storage=None):
     width, height = pil_img.size
 
     #save document record
-    img_obj = __new_img_obj(file_path, filename, height, storage, width)
+    img_obj = __new_img_obj(filename, height, storage, width)
 
     #cleanup
-    if storage != ImageStorage.LOCAL:
+    if storage != MediaStorage.LOCAL:
         os.remove(file_path)
 
     return img_obj
@@ -135,7 +175,7 @@ def __resize(img_obj, new_height, new_width, resized_obj):
 
     #upload
     f = open(temp_file_path, 'r')
-    if img_obj.storage == ImageStorage.S3:
+    if img_obj.storage == MediaStorage.S3:
         __store_s3(filename, f)
     f.close()
 
@@ -143,7 +183,7 @@ def __resize(img_obj, new_height, new_width, resized_obj):
     resized_obj = __new_img_obj(filename, new_height, img_obj.storage, new_width)
 
     #cleanup
-    if img_obj.storage != ImageStorage.LOCAL:
+    if img_obj.storage != MediaStorage.LOCAL:
         os.remove(temp_file_path)
 
     return resized_obj
@@ -159,13 +199,13 @@ def resize(img_obj, new_width, new_height):
 
 
 def get(id):
-    coll = Image.collection()
+    coll = Media.collection()
     dic = coll.find_one({"_id": coerce_bson_id(id)})
-    return Image.unserialize(dic) if dic is not None else None
+    return Media.unserialize(dic) if dic is not None else None
 
 
 def find(filename, width=None, height=None):
-    coll = Image.collection()
+    coll = Media.collection()
     find_params_lis = [
         {"file_name": filename},
     ]
@@ -175,15 +215,20 @@ def find(filename, width=None, height=None):
             {"height": height},
         ]
     dic = coll.find_one({"$and": find_params_lis})
-    return Image.unserialize(dic) if dic is not None else None
+    return Media.unserialize(dic) if dic is not None else None
 
 
-def url_for(image_obj):
-    if image_obj.storage == ImageStorage.S3:
-        return "%s%s" % (CLOUDFRONT_URL, image_obj.file_name)
-    return "%s%s%s" % (DOMAIN, UPLOAD_RELATIVE_ENDPOINT, image_obj.file_name)
+def url_for(media_obj):
+    if media_obj.storage == MediaStorage.S3:
+        return "%s%s" % (CLOUDFRONT_URL, media_obj.file_name)
+    return "%s/%s/%s" % (DOMAIN, UPLOAD_RELATIVE_ENDPOINT, media_obj.file_name)
 
 
-class ImageStorage:
+class MediaStorage:
     S3 = "s3"
     LOCAL = "local"
+
+
+class MediaType:
+    IMAGE = "img"
+    OTHERS = "others"

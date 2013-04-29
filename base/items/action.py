@@ -1,10 +1,12 @@
 #--- item functions ---
 import datetime
+import re
+
+import unidecode
+
 from base.items.model import Item, Container, ItemStatus
 from base.scheduling.decorator import schedulable
 from base.util import coerce_bson_id
-import re
-import unidecode
 
 
 def get(item_id):
@@ -39,6 +41,17 @@ def path(item_obj, excl_item=False):
     if not excl_item:
         path += [item_obj.slug_name + ".item"]
     return path
+
+
+def child_containers(container_obj):
+    """
+    Get all child containers of a given container
+    """
+    child_container_dics = Container.collection().find({
+        "parent_id": container_obj.obj_id() if container_obj is not None else None,
+    })
+    all_child_containers = [Container.unserialize(x) for x in child_container_dics]
+    return all_child_containers
 
 
 def container(item_obj):
@@ -88,36 +101,10 @@ def save(item_obj):
     id = col.insert(item_obj.serialize())
     return id
 
-
-def save_item(attr_dic, path_lis, publish_datetime=None):
-    """
-    Shortcut function to creating an item object.
-    Returns item object.
-    """
-    container_obj = container_from_path(path_lis)
-    if container_obj:
-        container_obj = save_container_path(path_lis)
-    if publish_datetime is None:
-        publish_datetime = datetime.datetime.utcnow()
-
-    #custom attr
-    fields = Item.INCLUDED_FIELDS + Item.META_FIELDS
-    keys = attr_dic.keys()
-    not_part_of_fields = [x for x in keys if x not in fields]
-
-    item_obj = Item(**attr_dic)
-    item_obj.publish_datetime = publish_datetime
-    item_obj.container_id = container_obj.obj_id()
-    item_obj.slug_name = slugify_item_name(item_obj)
-    item_obj.status = ItemStatus.VISIBLE
-    item_obj.custom_attr_lis = not_part_of_fields
-    item_obj._id = save(item_obj)
-    return item_obj
-
-
 #--- container functions ---
 
 def move_container(container_obj, new_parent_path_lis):
+    #TODO
     pass
 
 
@@ -178,16 +165,16 @@ def get_all(container_obj, find_param_lis=None, limit=None):
     """
     if find_param_lis is None:
         find_param_lis = []
-    if limit is None:
-        limit = 5
+    args = {}
+    if limit is not None:
+        args["limit"] = limit
 
     coll = Item.collection()
-    lis_of_dic = coll.find({"container_id": container_obj.obj_id()})
     lis_of_dic = coll.find({
-        "$and": [
-                    {"container_id": container_obj.obj_id()}
-                ] + find_param_lis,
-    }, limit=limit)
+                               "$and": [
+                                           {"container_id": container_obj.obj_id() if container_obj is not None else None}
+                                       ] + find_param_lis,
+                           }, **args)
     return [Item.unserialize(x) for x in lis_of_dic]
 
 
@@ -196,6 +183,8 @@ def container_path(path_lis):
     Returns the Container path list, if it already isn't.
     "/menu/restaurant/item.item" will return "/menu/restaurant/" in list repr
     """
+    if path_lis is None:
+        return None
     if path_lis[-1][-5:len(path_lis[-1])] != ".item":
         return path_lis
     return path_lis[:-1]

@@ -1,4 +1,5 @@
 from base.base_model import Base
+from base import media
 from base.scheduling.model import SchedulingBase
 
 
@@ -11,6 +12,7 @@ class Container(Base):
         super(Container, self).__init__()
 
         self.name = None
+        self.description = None
         self.slug_name = None
         self.materialized_path = None #represented in list repr
         self.parent_id = None
@@ -24,30 +26,31 @@ class Container(Base):
 
     @staticmethod
     def coll_name():
-        return "containers"
+        return "container"
 
 
 class Item(SchedulingBase):
-    INCLUDED_FIELDS = ["name", "image", "description", "price"]
-    META_FIELDS = ["slug_name", "container_id", "status", "custom_attr_lis"]
-
     def __init__(self, **kwargs):
         super(Item, self).__init__()
 
         #basic attr
         self.name = None
-        self.image = None
+        self.media_id = None
         self.description = None
+        self.quantity = None
         self.price = None
 
         #meta
-        self.slug_name = None
         self.container_id = None
         self.status = None
-        self.custom_attr_lis = []
 
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
+
+    def serialize(self, json_friendly=False):
+        dic = super(Item, self).serialize(json_friendly)
+        dic["media_url"] = media.url_for(media.get(self.media_id))
+        return dic
 
     @staticmethod
     def unserialize(dic):
@@ -55,7 +58,7 @@ class Item(SchedulingBase):
 
     @staticmethod
     def coll_name():
-        return "items"
+        return "item"
 
 
 class ItemStatus:

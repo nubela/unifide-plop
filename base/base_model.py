@@ -1,6 +1,8 @@
 import datetime
+from bson import ObjectId
 from base.db import get_mongo
 from base.util import coerce_bson_id
+import time
 
 
 class Base(object):
@@ -17,9 +19,17 @@ class Base(object):
         """
         return coerce_bson_id(self._id)
 
-    def serialize(self):
-        banned_keys = ["_id", ]
-        return {k: v for k, v in self.__dict__.iteritems() if k not in banned_keys}
+    def serialize(self, json_friendly=False):
+        dic = {k: v for k, v in self.__dict__.iteritems()}
+
+        if json_friendly:
+            for k, v in dic.items():
+                if type(v) == datetime.datetime:
+                    dic[k] = time.mktime(v.timetuple())
+                elif type(v) == ObjectId:
+                    dic[k] = str(v)
+        return dic
+
 
     @staticmethod
     def unserialize(json):
