@@ -91,14 +91,10 @@ def move(item_obj, new_path_lis):
     pass
 
 
-def update(item_obj):
-    pass
-
-
 @schedulable
 def save(item_obj):
     col = Item.collection()
-    id = col.insert(item_obj.serialize())
+    id = col.save(item_obj.serialize())
     return id
 
 #--- container functions ---
@@ -110,7 +106,7 @@ def move_container(container_obj, new_parent_path_lis):
 
 def save_container(container_obj):
     col = Container.collection()
-    id = col.insert(container_obj.serialize())
+    id = col.save(container_obj.serialize())
     return id
 
 

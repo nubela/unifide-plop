@@ -1,6 +1,8 @@
 from base import items
+from base.items import Item
 from base.org import ORG_PATH
 from base.org.model import OrgInfo
+
 
 def get():
     """
@@ -37,12 +39,15 @@ def save(org_info_obj):
         if existing_item:
             if existing_item.description != v:
                 existing_item.description = v
-                items.update(existing_item)
+                items.save(existing_item)
         else:
-            items.save_item({
+            container_obj = items.container_from_path(ORG_PATH)
+            item_obj = Item.unserialize({
                 "name": k,
                 "description": v,
-            }, ORG_PATH)
+                "container_id": container_obj.obj_id(),
+            })
+            items.save(item_obj)
 
 
 def __has_item(item_list, key):

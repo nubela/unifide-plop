@@ -42,14 +42,19 @@ class Item(SchedulingBase):
 
         #meta
         self.container_id = None
-        self.status = None
+        self.status = ItemStatus.VISIBLE
 
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
 
     def serialize(self, json_friendly=False):
         dic = super(Item, self).serialize(json_friendly)
-        dic["media_url"] = media.url_for(media.get(self.media_id))
+
+        if self.media_id is not None:
+            dic["media_url"] = media.url_for(media.get(self.media_id))
+        else:
+            dic["media_url"] = None
+
         return dic
 
     @staticmethod

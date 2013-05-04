@@ -1,3 +1,7 @@
+import datetime
+from bson import ObjectId
+
+
 class OrgInfo():
     #enumerator
     ADDRESS = "address"
@@ -13,3 +17,14 @@ class OrgInfo():
 
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
+
+    def serialize(self, json_friendly=False):
+        dic = {k: v for k, v in self.__dict__.iteritems()}
+
+        if json_friendly:
+            for k, v in dic.items():
+                if type(v) == datetime.datetime:
+                    dic[k] = datetime.time.mktime(v.timetuple())
+                elif type(v) == ObjectId:
+                    dic[k] = str(v)
+        return dic
