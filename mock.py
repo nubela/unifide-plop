@@ -12,7 +12,6 @@ if __name__ == "__main__":
     for package in INSTALLED_PACKAGES:
         #try to import mocking util
         try:
-            pkg = __import__("%s.mock" % package)
             pkg = importlib.import_module("%s.mock" % package)
             pkg.mock_and_save()
         except ImportError:

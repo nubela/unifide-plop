@@ -47,4 +47,4 @@ class User(Base):
 
     @staticmethod
     def coll_name():
-        return "users"
+        return "user"

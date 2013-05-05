@@ -1,6 +1,9 @@
 from random import choice
-from base.items import  save_item, save_container_path
+
 import loremipsum
+
+from base.items import save_item, save_container_path
+
 
 def mock_and_save():
     print "Mocking items.."

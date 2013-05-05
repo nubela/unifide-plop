@@ -64,7 +64,7 @@ def save(user_obj,
 
     def save_obj():
         coll = User.collection()
-        user_obj._id = coll.insert(user_obj.serialize())
+        user_obj._id = coll.save(user_obj.serialize())
         return user_obj
 
     if need_confirmation:
@@ -78,7 +78,7 @@ def save(user_obj,
             relative_url=confirmation_relative_url
         )
 
-    return saved_user_obj
+    return saved_user_obj._id
 
 
 def is_anon(user_obj):
