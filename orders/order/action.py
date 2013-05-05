@@ -39,8 +39,8 @@ def get_order_by_attr(**kwargs):
 
 
 class OrderStatus:
-    SHIPPED = "shipped"
-    PROCESSING = "processing"
-    OK = "ok" #or rsvped if it is for events
-    CANCELLED = "cancelled"
-    HOLD = "hold"
+    SHIPPED = "Shipped"
+    PROCESSING = "Processing"
+    OK = "New" #or rsvped if it is for events
+    CANCELLED = "Cancelled"
+    HOLD = "On Hold"

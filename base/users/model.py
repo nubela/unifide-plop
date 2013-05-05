@@ -9,6 +9,7 @@ class User(Base):
         self.middle_name = ""
         self.last_name = ""
         self.email = None
+        self.address = None
         self.passwd_hash = None
 
         #facebook oauth
