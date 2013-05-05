@@ -1,25 +1,6 @@
+from base import users
 from base.base_model import Base
-from base.scheduling.model import SchedulingBase
-
-
-class StockAvailability(SchedulingBase):
-    def __init__(self, **kwargs):
-        super(StockAvailability, self).__init__()
-
-        self.obj_id = None
-        self.coll_name = None
-        self.availability = None #integer, float
-
-        for k, v in kwargs.iteritems():
-            setattr(self, k, v)
-
-    @staticmethod
-    def unserialize(dic):
-        return StockAvailability(**dic)
-
-    @staticmethod
-    def coll_name():
-        return "stock_avail"
+from model_mapping import COLLECTION_MAP
 
 
 class Order(Base):
@@ -29,9 +10,24 @@ class Order(Base):
         self.user_id = None
         self.obj_id = None
         self.coll_name = None
+        self.quantity = None
+        self.special_notes = None
+
+        self.status = None
+        self.status_private_notes = None
+        self.status_public_notes = None
 
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
+
+    def serialize(self, json_friendly=False):
+        dic = super(Order, self).serialize(json_friendly)
+        if json_friendly:
+            user_obj = users.get(self.user_id)
+            dic["user"] = user_obj.serialize(json_friendly)
+            obj_obj = COLLECTION_MAP[self.coll_name]["get"](self.obj_id)
+            dic["object"] = obj_obj.serialize(json_friendly)
+        return dic
 
     @staticmethod
     def unserialize(dic):
@@ -39,4 +35,4 @@ class Order(Base):
 
     @staticmethod
     def coll_name():
-        return "orders"
+        return "order"

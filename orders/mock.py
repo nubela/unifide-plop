@@ -1,7 +1,7 @@
 from random import choice
 import loremipsum
 from base import items, users
-import orders
+from orders import save, Order, OrderStatus
 
 
 GEN_ITEM_PATH_LIS = ["Order Mock"]
@@ -54,10 +54,10 @@ def gen_orders(user_lis, item_lis, total_orders=50):
             "coll_name": "item",
             "quantity": choice(range(1, 2)),
             "special_notes": loremipsum.sentence(),
-            "status": orders.OrderStatus.OK,
+            "status": OrderStatus.OK,
         }
-        order_obj = orders.Order.unserialize(dic)
-        orders.save(order_obj)
+        order_obj = Order.unserialize(dic)
+        save(order_obj)
 
 
 def mock_and_save():
