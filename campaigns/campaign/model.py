@@ -13,7 +13,8 @@ class Campaign(Base):
         self.item_id_lis = []
 
         #event specific
-        self.happening_datetime = None
+        self.happening_datetime_start = None
+        self.happening_datetime_end = None
 
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
