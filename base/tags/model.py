@@ -1,12 +1,11 @@
 from base.base_model import Base
 
 
-class Comment(Base):
+class Tag(Base):
     def __init__(self, **kwargs):
-        super(Comment, self).__init__()
+        super(Tag, self).__init__()
 
-        self.user_id = None
-        self.comment = None
+        self.tag = None
         self.obj_id = None
         self.coll_name = None
 
@@ -15,8 +14,8 @@ class Comment(Base):
 
     @staticmethod
     def unserialize(dic):
-        return Comment(**dic)
+        return Tag(**dic)
 
     @staticmethod
     def coll_name():
-        return "comment"
+        return "tag"

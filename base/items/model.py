@@ -1,5 +1,4 @@
 from base.base_model import Base
-from base import media
 from base.scheduling.model import SchedulingBase
 
 
@@ -39,6 +38,8 @@ class Item(SchedulingBase):
         self.description = None
         self.quantity = None
         self.price = None
+        self.custom_attr_lis = []
+        self.custom_media_lis = []
 
         #meta
         self.container_id = None
@@ -48,12 +49,15 @@ class Item(SchedulingBase):
             setattr(self, k, v)
 
     def serialize(self, json_friendly=False):
-        dic = super(Item, self).serialize(json_friendly)
+        from base import media, tags
 
-        if self.media_id is not None:
-            dic["media_url"] = media.url_for(media.get(self.media_id))
-        else:
-            dic["media_url"] = None
+        dic = super(Item, self).serialize(json_friendly)
+        if json_friendly:
+            dic["tags"] = [x.tag for x in tags.get_tags(self)]
+            if self.media_id is not None:
+                dic["media_url"] = media.url_for(media.get(self.media_id))
+            else:
+                dic["media_url"] = None
 
         return dic
 
