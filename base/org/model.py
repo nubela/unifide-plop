@@ -7,12 +7,18 @@ class OrgInfo():
     ADDRESS = "address"
     ORG_NAME = "name"
     CONTACT_EMAIL = "email"
+    BIZ_INFO = "info"
+    BIZ_PHONE = "phone"
     BIZ_DESCRIPTION = "description"
+    BIZ_WEBSITE = "website"
 
     def __init__(self, **kwargs):
         self.name = None
         self.address = None
         self.email = None
+        self.website = None
+        self.info = None
+        self.phone = None
         self.description = None
 
         for k, v in kwargs.iteritems():
