@@ -1,6 +1,5 @@
 from base import users
 from base.base_model import Base
-from model_mapping import COLLECTION_MAP
 
 
 class Order(Base):

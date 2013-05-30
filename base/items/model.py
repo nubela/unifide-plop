@@ -48,6 +48,14 @@ class Item(SchedulingBase):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
 
+    @property
+    def media_url(self):
+        from base import media
+        if self.media_id is not None:
+            return media.url_for(media.get(self.media_id))
+        return None
+
+
     def serialize(self, json_friendly=False):
         from base import media, tags
 

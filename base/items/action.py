@@ -1,10 +1,9 @@
 #--- item functions ---
-import datetime
 import re
 
 import unidecode
 
-from base.items.model import Item, Container, ItemStatus
+from base.items.model import Item, Container
 from base.scheduling.decorator import schedulable
 from base.util import coerce_bson_id
 
@@ -16,6 +15,19 @@ def get(item_id):
     coll = Item.collection()
     dic = coll.find_one({"_id": coerce_bson_id(item_id)})
     return Item.unserialize(dic) if dic is not None else None
+
+
+def remove(item_id):
+    """
+    Delete item from id
+    """
+    coll = Item.collection()
+    coll.remove({"_id": coerce_bson_id(item_id)})
+
+
+def remove_container(container_id):
+    coll = Container.collection()
+    coll.remove({"_id": coerce_bson_id(container_id)})
 
 
 def item_from_path(path_lis):
@@ -110,7 +122,7 @@ def save_container(container_obj):
     return id
 
 
-def save_container_path(container_path_lis):
+def save_container_path(container_path_lis, description=None):
     """
     Shortcut for creating containers.
 
@@ -124,6 +136,7 @@ def save_container_path(container_path_lis):
             container_obj.slug_name = __slugify(path[-1])
             container_obj.name = path[-1]
             container_obj.materialized_path = path
+            container_obj.description = description
 
             if i > 1:
                 parent_obj = container_from_path(path[0:-1])
@@ -168,7 +181,8 @@ def get_all(container_obj, find_param_lis=None, limit=None):
     coll = Item.collection()
     lis_of_dic = coll.find({
                                "$and": [
-                                           {"container_id": container_obj.obj_id() if container_obj is not None else None}
+                                           {
+                                               "container_id": container_obj.obj_id() if container_obj is not None else None}
                                        ] + find_param_lis,
                            }, **args)
     return [Item.unserialize(x) for x in lis_of_dic]
