@@ -49,6 +49,11 @@ class Item(SchedulingBase):
             setattr(self, k, v)
 
     @property
+    def tags(self):
+        from base import tags
+        return [x.tag for x in tags.get_tags(self)]
+
+    @property
     def media_url(self):
         from base import media
         if self.media_id is not None:
