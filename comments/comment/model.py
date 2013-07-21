@@ -13,6 +13,11 @@ class Comment(Base):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
 
+    @property
+    def user(self):
+        from base import users
+        return users.get(self.user_id)
+
     @staticmethod
     def unserialize(dic):
         return Comment(**dic)
