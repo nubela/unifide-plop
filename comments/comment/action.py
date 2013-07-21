@@ -1,5 +1,6 @@
 from base.util import coerce_bson_id
 from comments.comment.model import Comment
+import pymongo
 
 
 def comment(user_obj, comment_str, obj_id, coll_name):
@@ -42,7 +43,7 @@ def get_all(obj_id, collection_name, limit=None):
     comments = Comment.collection().find({
         "obj_id": coerce_bson_id(obj_id),
         "coll_name": collection_name
-    })
+    }).sort("timestamp_utc", pymongo.DESCENDING)
     comment_obj_lis = [Comment.unserialize(x) for x in comments]
     return comment_obj_lis
 
