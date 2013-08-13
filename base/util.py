@@ -1,10 +1,14 @@
+from functools import wraps
 import uuid
 from datetime import datetime
 import time
 from random import choice
-from cfg import ASSETS_FOLDER
 import os
+
+from flask import request, current_app
 from bson import ObjectId
+
+from cfg import ASSETS_FOLDER
 
 
 def coerce_bson_id(str_id):
@@ -33,7 +37,7 @@ def read_template(relative_template_path, templates_folder=None):
     return f.read()
 
 
-def __gen_random_datetime(random_day_range, __cache__ = {}):
+def __gen_random_datetime(random_day_range, __cache__={}):
     seconds_a_day = 24 * 60 * 60
     now = datetime.utcnow()
     timestamp = __serialize_json_datetime(now)
@@ -46,3 +50,20 @@ def __gen_random_datetime(random_day_range, __cache__ = {}):
 
     random_timestamp = choice(__cache__[cache_key])
     return __unserialize_json_datetime(random_timestamp)
+
+
+def jsonp(func):
+    """Wraps JSONified output for JSONP requests."""
+
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        callback = request.args.get('callback', False)
+        if callback:
+            data = str(func(*args, **kwargs).data)
+            content = str(callback) + '(' + data + ')'
+            mimetype = 'application/javascript'
+            return current_app.response_class(content, mimetype=mimetype)
+        else:
+            return func(*args, **kwargs)
+
+    return decorated_function
