@@ -17,6 +17,10 @@ def get(item_id):
     return Item.unserialize(dic) if dic is not None else None
 
 
+def item_container(item_obj):
+    return get_container(item_obj.container_id)
+
+
 def remove(item_id):
     """
     Delete item from id
@@ -198,3 +202,15 @@ def container_path(path_lis):
     if path_lis[-1][-5:len(path_lis[-1])] != ".item":
         return path_lis
     return path_lis[:-1]
+
+def parent_container(container_obj):
+    return get_container(container_obj.parent_id)
+
+def is_parent_container(parent_container_obj, child_container_obj):
+    """
+    Checks if a container is a parent of a child container
+    """
+    if not child_container_obj.parent_id: return False
+    parent = parent_container(child_container_obj)
+    if parent._id == parent_container_obj._id: return True
+    return is_parent_container(parent_container_obj, parent)

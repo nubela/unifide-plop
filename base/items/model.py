@@ -19,6 +19,13 @@ class Container(Base):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
 
+    @property
+    def slug_name(self):
+        from base import slugs
+
+
+        return slugs.sluggify(self.name, self._id, Container.coll_name())
+
     @staticmethod
     def unserialize(dic):
         return Container(**dic)
@@ -49,13 +56,24 @@ class Item(SchedulingBase):
             setattr(self, k, v)
 
     @property
+    def slug_name(self):
+        from base import slugs
+
+
+        return slugs.sluggify(self.name, self._id, Container.coll_name())
+
+    @property
     def tags(self):
         from base import tags
+
+
         return [x.tag for x in tags.get_tags(self)]
 
     @property
     def media_url(self):
         from base import media
+
+
         if self.media_id is not None:
             return media.url_for(media.get(self.media_id))
         return None
@@ -63,6 +81,7 @@ class Item(SchedulingBase):
 
     def serialize(self, json_friendly=False):
         from base import media, tags
+
 
         dic = super(Item, self).serialize(json_friendly)
         if json_friendly:

@@ -1,46 +1,53 @@
-from base.util import coerce_bson_id
-from orders.order.model import Order
+from orders import Order
+from base import items
 
 
-def save(order_obj):
+def new(user_id):
+    o = Order()
+    o.user_id = user_id
+    o.status = OrderStatus.NEW
+    return o
+
+
+def update_status(order_obj, status):
+    order_obj.status = status
+    return order_obj
+
+
+def add_item(order_obj, item_obj, quantity):
+    remove_item(order_obj, item_obj, quantity)
+    order_obj.items += [{"obj_id": order_obj._id, "coll_name": items.Item.coll_name(), "quantity": quantity}]
+    return order_obj
+
+
+def remove_item(order_obj, item_obj):
+    return filter(lambda x: x["obj_id"] != item_obj._id, order_obj.items)
+
+
+def total_price(order_obj):
+    price = 0
+    for i in order_obj.items:
+        item = items.get(i["obj_id"])
+        price += item.price * i["quantity"]
+    return price
+
+
+def append_credit(order_obj, credit_obj):
     """
-    Confirms and saves an order of an item
+    {obj_id: None, coll_name: None, amount=None}
     """
-    return Order.collection().save(order_obj.serialize())
+    order_obj.credit += [credit_obj]
+    return order_obj
 
 
-def remove(user_obj, collection_name, item_id):
-    """
-    Removes an order of an item
-    """
-    order_obj = get_order_by_attr(**{
-        "obj_id": coerce_bson_id(item_id),
-        "user_id": user_obj.obj_id(),
-        "collection_name": collection_name,
-    })
-    Order.collection().remove({
-        "_id": order_obj.obj_id()
-    })
-
-
-def get(order_id):
-    """
-    Gets an order object given its id
-    """
-    dic = Order.collection().find_one({
-        "_id": coerce_bson_id(order_id),
-    })
-    return Order.unserialize(dic) if dic is not None else None
-
-
-def get_order_by_attr(**kwargs):
-    dic = Order.collection().find_one(kwargs)
-    return Order.unserialize(dic) if dic is not None else None
+def append_debit(order_obj, debit_obj):
+    order_obj.debit += [debit_obj]
+    return order_obj
 
 
 class OrderStatus:
     SHIPPED = "Shipped"
     PROCESSING = "Processing"
-    OK = "New" #or rsvped if it is for events
+    NEW = "New"
     CANCELLED = "Cancelled"
     HOLD = "On Hold"

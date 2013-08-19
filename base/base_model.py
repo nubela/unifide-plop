@@ -1,8 +1,8 @@
 import datetime
+import time
 from bson import ObjectId
 from base.db import get_mongo
 from base.util import coerce_bson_id
-import time
 
 
 class Base(object):
@@ -30,6 +30,11 @@ class Base(object):
                     dic[k] = str(v)
         return dic
 
+    def save(self):
+        self.modification_timestamp_utc = datetime.datetime.utcnow()
+        col = self.collection()
+        id = col.save(self.serialize())
+        return id
 
     @staticmethod
     def unserialize(json):

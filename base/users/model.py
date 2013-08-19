@@ -1,5 +1,4 @@
 from base.base_model import Base
-from base.db import get_mongo
 
 
 class User(Base):
@@ -19,6 +18,7 @@ class User(Base):
         self.link = None
 
         #account meta
+        self.groups = []
         self.account_status = None
         self.tokens = {}
 
@@ -30,6 +30,8 @@ class User(Base):
 
     def is_active(self):
         from base.users import AccountStatus
+
+
         return self.account_status == AccountStatus.ENABLED
 
     def is_anonymous(self):
@@ -49,3 +51,9 @@ class User(Base):
     @staticmethod
     def coll_name():
         return "user"
+
+
+class Group(Base):
+    def __init__(self):
+        self.name = None
+        self.description = None

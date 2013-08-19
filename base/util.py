@@ -4,10 +4,8 @@ from datetime import datetime
 import time
 from random import choice
 import os
-
 from flask import request, current_app
 from bson import ObjectId
-
 from cfg import ASSETS_FOLDER
 
 
