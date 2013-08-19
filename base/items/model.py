@@ -20,7 +20,7 @@ class Container(Base):
             setattr(self, k, v)
 
     @property
-    def slug_name(self):
+    def sluggify(self):
         from base import slugs
 
 

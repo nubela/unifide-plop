@@ -1,4 +1,4 @@
-from orders import Order
+from orders.order.model import Order
 from base import items
 
 
