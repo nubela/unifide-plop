@@ -26,6 +26,8 @@ class Container(Base):
 
         return slugs.sluggify(self.name, self._id, Container.coll_name())
 
+
+
     @staticmethod
     def unserialize(dic):
         return Container(**dic)

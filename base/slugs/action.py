@@ -14,6 +14,13 @@ def sluggify(string_to_slugify, item_id, item_coll_name):
     """
     Translates an object into a readable slug (for readability purposes)
     """
+    possible_slug = Slug.collection().find_one({
+        "coll_name": item_coll_name,
+        "item_id": item_id
+    })
+    if possible_slug is not None:
+        return possible_slug["name"]
+
     base_slugged_name = unidecode.unidecode(string_to_slugify)
 
     #ensure that this is unique
@@ -28,7 +35,7 @@ def sluggify(string_to_slugify, item_id, item_coll_name):
     s.coll_name = item_coll_name
     s.item_id = item_id
     s.name = slugged_name
-    id = s.save()
+    s.save()
 
     return slugged_name
 
