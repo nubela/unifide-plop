@@ -103,10 +103,9 @@ def set_passwd(saved_user_obj, new_passwd):
     """
     Sets a new password for a given user object that already exists in the collection
     """
-    passwd_hash = gen_passwd_hash(new_passwd, saved_user_obj.id())
+    passwd_hash = gen_passwd_hash(new_passwd, saved_user_obj.obj_id())
     saved_user_obj.passwd_hash = passwd_hash
-    coll = User.collection()
-    coll.update({'_id': saved_user_obj.obj_id()}, {"$set": saved_user_obj.serialize()}, upsert=False)
+    saved_user_obj.save()
     return saved_user_obj
 
 
@@ -119,9 +118,7 @@ def generate_token(user_obj, account_activity):
     it with a new one that this will generate.
     """
     user_obj.tokens[account_activity] = __gen_uuid()
-
-    coll = User.collection()
-    coll.update({'_id': user_obj.obj_id()}, {"$set": user_obj.serialize()}, upsert=False)
+    user_obj.save()
     return user_obj.tokens[account_activity]
 
 
@@ -156,7 +153,7 @@ def check_token(user_obj, account_activity, token):
 
 
 def auth(user_obj, given_password):
-    given_pass_hash = gen_passwd_hash(given_password, user_obj.id())
+    given_pass_hash = gen_passwd_hash(given_password, user_obj.obj_id())
     return user_obj.passwd_hash == given_pass_hash
 
 

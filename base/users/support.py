@@ -1,18 +1,17 @@
 """
 The support library for plop.py functions
 """
-from functools import wraps
 from base import users
 from base.users.util import generate_login_form, generate_form, get_form_values, FormType, FormValidator
-from flask import request, render_template, redirect, current_app
-from flask.ext.login import login_user, logout_user, login_required, current_user
+from flask import request, render_template, redirect
+from flask.ext.login import login_user, logout_user
 from flask.helpers import url_for
 
 
 def _httpget_login():
     login_form = generate_login_form()
     login_form = generate_form(login_form, **{
-        "action": "/login/",
+        "action": "/login",
         "method": "post",
     })
     return render_template("login.html", **{
@@ -22,15 +21,17 @@ def _httpget_login():
 
 
 def _post_login():
-    redirect_to = request.args.get("redirect_to")
+    redirect_to = request.args.get("redirect_to","/")
     login_form = generate_login_form()
     form_values = get_form_values(request, login_form)
     username = form_values["username"]
     passwd = form_values["password"]
     user_obj = users.get_user_by_attr({"username": username})
+
     if users.auth(user_obj, passwd):
         login_user(user_obj)
         return redirect(redirect_to)
+
     return redirect(url_for("login_user") + "?login=unsuccessful")
 
 
@@ -83,7 +84,7 @@ def _get_registration_form():
 
 def _httpget_register():
     registration_form = generate_form(_get_registration_form(), **{
-        "action": "/register/",
+        "action": "/register?redirect_to=/",
         "method": "post",
     })
     return render_template("registration.html", **{
@@ -96,6 +97,8 @@ def _post_register():
     redirect_to = request.args.get("redirect_to")
     values = get_form_values(request, _get_registration_form())
     dic = {k: v for k, v in values.iteritems()}
+    del dic["cfm_password"]
+    del dic["password"]
     user_obj = users.User(
         **dic
     )
@@ -107,12 +110,13 @@ def _post_register():
                     "username": user_obj.username
                 }]
     }):
-        user_obj = users.save(user_obj, need_confirmation=True,
+        user_obj._id = users.save(user_obj, need_confirmation=False,
                               confirmation_email_subject="Complete your account registration",
                               confirmation_relative_url="/register/confirm/")
         users.set_passwd(user_obj, values["password"])
         return redirect(redirect_to)
 
+    login_user(user_obj)
     return redirect(url_for("register_user") + "?user=exists")
 
 
@@ -157,7 +161,7 @@ def _httpget_forgot_password():
 
 def _post_forgot_password():
     form = _forgot_passwd_form()
-    form_values = get_form_values(request, _forgot_passwd_form())
+    form_values = get_form_values(request, form)
     user_obj = users.get_user_by_attr({"email": form_values["email"]})
     users.send_reset_passwd_notice(user_obj)
     return render_template("forgot_password_done.html")
