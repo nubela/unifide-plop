@@ -44,5 +44,6 @@ def unsluggify(slugged_name, item_coll_name, obj_class_ref):
     """
     Translates a slug into an object ID
     """
-    dic = get_slug_w_attr(slugged_name, item_coll_name)
+    slug_dic = get_slug_w_attr(slugged_name, item_coll_name)
+    dic = obj_class_ref.collection().find_one({"_id": slug_dic["item_id"]})
     return obj_class_ref.unserialize(dic) if dic is not None else None

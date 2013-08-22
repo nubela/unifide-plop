@@ -1,3 +1,4 @@
+import uuid
 from base.base_model import Base
 from base.scheduling.model import SchedulingBase
 
@@ -27,7 +28,6 @@ class Container(Base):
         return slugs.sluggify(self.name, self._id, Container.coll_name())
 
 
-
     @staticmethod
     def unserialize(dic):
         return Container(**dic)
@@ -51,6 +51,7 @@ class Item(SchedulingBase):
         self.custom_media_lis = []
 
         #meta
+        self.group_id = str(uuid.uuid1())
         self.container_id = None
         self.status = ItemStatus.VISIBLE
 
@@ -58,11 +59,11 @@ class Item(SchedulingBase):
             setattr(self, k, v)
 
     @property
-    def slug_name(self):
+    def sluggify(self):
         from base import slugs
 
 
-        return slugs.sluggify(self.name, self._id, Container.coll_name())
+        return slugs.sluggify(self.name, self._id, Item.coll_name())
 
     @property
     def tags(self):

@@ -31,8 +31,8 @@ class User(Base):
     def is_active(self):
         from base.users import AccountStatus
 
-
-        return self.account_status == AccountStatus.ENABLED
+        return True
+        # return self.account_status == AccountStatus.ENABLED
 
     def is_anonymous(self):
         return self.username is None and self.email is None

@@ -8,6 +8,32 @@ from base.scheduling.decorator import schedulable
 from base.util import coerce_bson_id
 
 
+def one(item_id):
+    """
+    Returns the group of items simialr to this item as a list
+    """
+    item = get(item_id)
+    group_id = item.group_id
+    dic_lis = Item.collection().find({"group_id": group_id})
+    similar_items = map(lambda x: Item.unserialize(x), dic_lis)
+    return similar_items
+
+
+def get_groups(container_obj):
+    """
+    Returns a list of list of similar items in a container
+    """
+    all_items = get_all(container_obj)
+    d = {}
+    for i in all_items:
+        if i.group_id not in d: d[i.group_id] = []
+        d[i.group_id] += [i]
+    lis_lis = []
+    for k, v in d.items():
+        lis_lis += [v]
+    return lis_lis
+
+
 def get(item_id):
     """
     Get item from id
@@ -203,8 +229,10 @@ def container_path(path_lis):
         return path_lis
     return path_lis[:-1]
 
+
 def parent_container(container_obj):
     return get_container(container_obj.parent_id)
+
 
 def is_parent_container(parent_container_obj, child_container_obj):
     """

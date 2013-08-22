@@ -75,7 +75,7 @@ def cashback_value(cashback_rule, order_obj):
     return price
 
 
-def active_cashback():
+def get():
     dic = CashbackRule.collection().find_one({
         "status": CashbackStatus.ENABLED,
     })

@@ -29,8 +29,8 @@ def _post_login():
     user_obj = users.get_user_by_attr({"username": username})
 
     if users.auth(user_obj, passwd):
-        login_user(user_obj)
-        return redirect(redirect_to)
+        if login_user(user_obj):
+            return redirect(redirect_to)
 
     return redirect(url_for("login_user") + "?login=unsuccessful")
 

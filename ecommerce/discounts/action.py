@@ -1,6 +1,7 @@
 from decimal import Decimal
 import datetime
 from base import items
+from ecommerce.discounts.model import Discount
 import orders
 
 
@@ -19,9 +20,28 @@ def is_container_scoped(discount, container_obj):
         return True
     if discount.collection_name != items.Container.coll_name():
         return False
-    if container_obj._id != discount.obj_id and not items.is_parent_container(items.get_container(discount.obj_id), container_obj):
+    if container_obj._id != discount.obj_id and not items.is_parent_container(items.get_container(discount.obj_id),
+                                                                              container_obj):
         return False
     return True
+
+
+def best_percentage(discount_lis):
+    """
+    Returns the best discount with percentage discount applicable
+    """
+    discount_lis = filter(lambda x: x.discount_percentage != None, discount_lis)
+    lis = sorted(discount_lis, key=lambda x: x.discount_percentage, reverse=True)
+    return lis[0] if len(lis) > 0 else None
+
+
+def best_absolute(discount_lis):
+    """
+    Returns the best discount with percentage discount applicable
+    """
+    discount_lis = filter(lambda x: x.absolute_discounted_price != None, discount_lis)
+    lis = sorted(discount_lis, key=lambda x: x.absolute_discounted_price, reverse=True)
+    return lis[0] if len(lis) > 0 else None
 
 
 def valid_on_item(discount, item_obj):
@@ -92,6 +112,14 @@ def get_order_price(order_obj, discount):
         return order_obj.price
 
     return discounted_price(orders.total_price(order_obj), discount)
+
+
+def get_all():
+    """
+    Fetches all active discounts
+    """
+    dic_lis = Discount.collection().find({"status": DiscountStatus.ENABLED})
+    return map(lambda x: Discount.unserialize(x), dic_lis)
 
 
 class DiscountScope:
