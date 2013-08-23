@@ -47,6 +47,7 @@ class Item(SchedulingBase):
         self.description = None
         self.quantity = None
         self.price = None
+        self.weight = None
         self.custom_attr_lis = []
         self.custom_media_lis = []
 

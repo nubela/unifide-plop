@@ -44,6 +44,22 @@ def best_absolute(discount_lis):
     return lis[0] if len(lis) > 0 else None
 
 
+def best(discount_lis, item_obj):
+    if len(discount_lis) == 0:
+        return None
+    if len(discount_lis) == 1:
+        return discount_lis[0]
+
+    d_v = {}
+    for d in discount_lis:
+        if not valid_on_item(d, item_obj): continue
+
+        discount_value = discounted_price(item_obj.price, d)
+        d_v[d] = discount_value
+    dv_items = sorted(d_v.items(), key=lambda x: x[1])
+    return dv_items[0][0] if len(dv_items) > 0 else None
+
+
 def valid_on_item(discount, item_obj):
     """
     Checks if a discount is valid on an item.
@@ -80,6 +96,10 @@ def valid_on_order(discount, order_obj):
     if discount.status == DiscountStatus.DISABLED:
         return False
     return True
+
+
+def discount_value(price, discount):
+    return Decimal(price) - discounted_price(price, discount)
 
 
 def discounted_price(price, discount):

@@ -7,7 +7,7 @@ class Order(Base):
 
         self.user_id = None
         self.status = None
-        self.items = [] # {obj_id: None, coll_name: None, quantity:None}
+        self.items = [] # {obj_id: None, quantity:None}
         self.request_notes = None
         self.admin_notes = None
 

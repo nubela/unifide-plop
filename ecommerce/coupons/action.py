@@ -1,7 +1,7 @@
 import datetime
 from decimal import Decimal
 from base import users, items
-from ecommerce.coupons.model import CouponLog
+from ecommerce.coupons.model import CouponLog, Coupon
 import orders
 
 
@@ -19,6 +19,11 @@ def apply_coupon(order_obj, coupon):
     """
     #todo
     _log(order_obj, coupon)
+
+
+def get_by_attr(coupon_code):
+    dic = Coupon.collection().find_one({"coupon_code": coupon_code})
+    return Coupon.unserialize(dic) if dic is not None else None
 
 
 def _general_discount(coupon, order_obj):

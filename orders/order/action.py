@@ -25,11 +25,21 @@ def remove_item(order_obj, item_obj):
 
 
 def total_price(order_obj):
+    """
+    Calculates the total price of all the items before any credit/debit filters
+    """
     price = 0
     for i in order_obj.items:
         item = items.get(i["obj_id"])
         price += item.price * i["quantity"]
     return price
+
+
+def nett_price(order_obj):
+    """
+    Calculates the total price of all the times after credit/debit filters
+    """
+    pass
 
 
 def append_credit(order_obj, credit_obj):
