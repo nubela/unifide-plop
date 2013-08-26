@@ -6,7 +6,7 @@ import orders
 
 
 def is_item_scoped(discount, item_obj):
-    if item_obj.discount_scope == DiscountScope.ALL_ITEMS:
+    if discount.discount_scope == DiscountScope.ALL_ITEMS:
         return True
     if discount.collection_name != items.Item.coll_name():
         return False
@@ -16,7 +16,7 @@ def is_item_scoped(discount, item_obj):
 
 
 def is_container_scoped(discount, container_obj):
-    if container_obj.discount_scope == DiscountScope.ALL_ITEMS:
+    if discount.discount_scope == DiscountScope.ALL_ITEMS:
         return True
     if discount.collection_name != items.Container.coll_name():
         return False
@@ -98,11 +98,11 @@ def valid_on_order(discount, order_obj):
     return True
 
 
-def discount_value(price, discount):
-    return Decimal(price) - discounted_price(price, discount)
+def discount_price(price, discount):
+    return Decimal(price) - discounted_value(price, discount)
 
 
-def discounted_price(price, discount):
+def discounted_value(price, discount):
     """
     Disregarding the validity of the discount, fetches the price after a discount is applied on the price.
     """

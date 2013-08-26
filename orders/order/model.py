@@ -18,6 +18,22 @@ class Order(Base):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
 
+
+    @property
+    def total_price(self):
+        import orders
+
+
+        print orders.total_price(self)
+        return orders.total_price(self)
+
+    @property
+    def nett_price(self):
+        import orders
+
+
+        return orders.nett_price(self)
+
     def serialize(self, json_friendly=False):
         dic = super(Order, self).serialize(json_friendly)
         return dic

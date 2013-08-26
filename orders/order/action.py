@@ -39,7 +39,9 @@ def nett_price(order_obj):
     """
     Calculates the total price of all the times after credit/debit filters
     """
-    pass
+    debit = sum(map(lambda x: x["amount"], order_obj.debits))
+    credit = sum(map(lambda x: x["amount"], order_obj.credits))
+    return total_price(order_obj) - debit + credit
 
 
 def append_credit(order_obj, credit_obj):

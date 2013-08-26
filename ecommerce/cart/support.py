@@ -1,4 +1,6 @@
+from ecommerce import cart
 from flask import request, session, jsonify
+import orders
 
 
 def _post_or_get(key, defa=None):
@@ -38,7 +40,14 @@ def rm_from_cart():
     if cart_name not in session:
         session[cart_name] = {}
 
-    del session[cart_name][item_id]
+    if item_id in session[cart_name]:
+        del session[cart_name][item_id]
+
+    order_obj = orders.Order.unserialize(session["current_order"])
+    cart.dic_to_order(session[cart_name], order_obj)
+    session["current_order"] = order_obj.serialize(json_friendly=True)
+    print session["current_order"]
+
     return jsonify({
         "status": "ok",
         "cart": session[cart_name],

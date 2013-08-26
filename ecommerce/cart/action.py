@@ -1,9 +1,12 @@
 import orders
+from  base import items
 
 
 def dic_to_order(cart_dic, o):
-    for k, v in cart_dic.items:
-        o.items += [{"obj_id": k, "quantity": v}]
+    o.items = []
+    for k, v in cart_dic.items():
+        if items.get(k) is not None:
+            o.items += [{"obj_id": k, "quantity": v}]
 
 
 def to_order(cart_dic):

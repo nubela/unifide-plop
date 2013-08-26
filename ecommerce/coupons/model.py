@@ -7,7 +7,7 @@ class Coupon(Base):
 
         #applied on (scope)
         self.coupon_scope = None
-        self.collection_name = None
+        self.coll_name = None
         self.obj_id = None
 
         #discount attr
