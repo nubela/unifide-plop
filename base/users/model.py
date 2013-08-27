@@ -54,9 +54,13 @@ class User(Base):
 
 
 class Group(Base):
-    def __init__(self):
+    def __init__(self, **kwargs):
+
         self.name = None
         self.description = None
+
+        for k, v in kwargs.iteritems():
+            setattr(self, k, v)
 
     @staticmethod
     def unserialize(dic):
