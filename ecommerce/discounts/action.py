@@ -54,7 +54,7 @@ def best(discount_lis, item_obj):
     for d in discount_lis:
         if not valid_on_item(d, item_obj): continue
 
-        discount_value = discounted_price(item_obj.price, d)
+        discount_value = discount_price(item_obj.price, d)
         d_v[d] = discount_value
     dv_items = sorted(d_v.items(), key=lambda x: x[1])
     return dv_items[0][0] if len(dv_items) > 0 else None
@@ -65,7 +65,7 @@ def valid_on_item(discount, item_obj):
     Checks if a discount is valid on an item.
     """
     item_container = items.item_container(item_obj)
-    if discount.discount_scope == DiscountScope.ORDER:
+    if discount.discount_scope == DiscountScope.ALL_ITEMS:
         return False
     if not is_item_scoped(discount, item_obj) and is_container_scoped(discount, item_container):
         return False
@@ -83,7 +83,7 @@ def valid_on_item(discount, item_obj):
 
 
 def valid_on_order(discount, order_obj):
-    if discount.discount_scope != DiscountScope.ORDER:
+    if discount.discount_scope != DiscountScope.ALL_ITEMS:
         return False
     utc_now = datetime.datetime.utcnow()
     if orders.total_price(order_obj) <= discount.order_minimum_spending:
@@ -121,7 +121,7 @@ def get_item_price(item_obj, discount):
     if not valid_on_item(discount, item_obj):
         return item_obj.price
 
-    return discounted_price(item_obj.price, discount)
+    return discount_price(item_obj.price, discount)
 
 
 def get_order_price(order_obj, discount):
@@ -131,7 +131,7 @@ def get_order_price(order_obj, discount):
     if not valid_on_order(discount, order_obj):
         return order_obj.price
 
-    return discounted_price(orders.total_price(order_obj), discount)
+    return discount_price(orders.total_price(order_obj), discount)
 
 
 def get_all():
@@ -146,12 +146,12 @@ class DiscountScope:
     CONTAINER_WIDE = "container_wide"
     ITEM_ONLY = "item_only"
     ALL_ITEMS = "all"
-    ORDER = "order"
 
 
 class DiscountLifetime:
     FOREVER = "forever"
     LIMITED = "limited"
+
 
 
 class DiscountStatus:

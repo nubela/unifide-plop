@@ -129,7 +129,6 @@ class CouponUserScope:
 
 
 class CouponStatus:
-    USED = "used"
     AVAILABLE = "available"
     DISABLED = "disabled"
 

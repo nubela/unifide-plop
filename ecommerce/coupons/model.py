@@ -13,6 +13,7 @@ class Coupon(Base):
         #discount attr
         self.coupon_code = None
         self.coupon_value = 0 # discount in absolute digits
+        self.coupon_percentage_off = 0 # discount in absolute digits
 
         #rule attr
         self.valid_times = 0
@@ -22,7 +23,7 @@ class Coupon(Base):
         self.coupon_lifetime_type = None
         self.user_scope = None
         self.user_id = None
-        self.user_group = None
+        self.user_group = []
 
         #status
         self.name = None

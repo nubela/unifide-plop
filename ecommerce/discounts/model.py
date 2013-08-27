@@ -18,7 +18,6 @@ class Discount(Base):
         self.absolute_discounted_price = 0 # discount in absolute digits
 
         #rule attr
-        self.item_minimum_spending = None # minimum spending
         self.order_minimum_spending = None # minimum spending
         self.begins_utc_datetime = None # utc datetime_obj
         self.expire_utc_datetime = None # utc datetime_obj
