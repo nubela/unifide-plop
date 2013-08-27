@@ -1,5 +1,5 @@
 from base import email
-from base.users.model import User
+from base.users.model import User, Group
 from base.users.util import gen_passwd_hash
 from base.util import coerce_bson_id, read_template, __gen_uuid
 from bson.objectid import ObjectId
@@ -73,9 +73,9 @@ def save(user_obj,
     saved_user_obj = save_obj()
     if need_confirmation:
         send_confirmation(saved_user_obj,
-            confirmation_email_subject,
-            confirmation_email_html,
-            relative_url=confirmation_relative_url
+                          confirmation_email_subject,
+                          confirmation_email_html,
+                          relative_url=confirmation_relative_url
         )
 
     return saved_user_obj._id
@@ -155,6 +155,18 @@ def check_token(user_obj, account_activity, token):
 def auth(user_obj, given_password):
     given_pass_hash = gen_passwd_hash(given_password, user_obj.obj_id())
     return user_obj.passwd_hash == given_pass_hash
+
+
+def get_group_name(group_name):
+    dic = Group.collection().find_one({"name": group_name})
+    return Group.unserialize(dic) if dic is not None else None
+
+
+def new_group(group_name, desc):
+    g = Group()
+    g.name = group_name
+    g.description = desc
+    return g.save()
 
 
 class AccountActivity:

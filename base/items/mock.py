@@ -1,4 +1,5 @@
 from random import choice
+from base import items
 from base.items import save_container_path, Item, container_from_path
 import loremipsum
 
@@ -65,25 +66,28 @@ def gen_model(model, existing_path_lis=None):
     for container_name, attr_dic in model.items():
         #save container
         path_lis = existing_path_lis + [container_name]
-        container_obj = save_container_path(path_lis)
-        if ContainerAttr.DESCRIPTION in model: container_obj.description = model[ContainerAttr.DESCRIPTION]
-        container_obj.save()
 
-        #create items
-        if "items" in model:
-            for item in model["items"]:
-                custom_type = item["custom"] if "custom" in item else None
-                if custom_type is None:
-                    i = Item(**{item})
-                    i.container_id = container_from_path(existing_path_lis)
-                    i.save()
-                elif custom_type == Generate.ITEMS_ONLY:
-                    all_items = _spawn_items(existing_path_lis)
-                    custom_attr = item["custom_attr"] if "custom_attr" in item else {}
-                    for k, v in custom_attr:
-                        for new_item in all_items:
-                            setattr(new_item, k, v)
-                    map(lambda x: x.save(), all_items)
+        #only create if container doesnt already exists
+        if items.container_from_path(path_lis) is None:
+            container_obj = save_container_path(path_lis)
+            if ContainerAttr.DESCRIPTION in model: container_obj.description = model[ContainerAttr.DESCRIPTION]
+            container_obj.save()
+
+            #create items
+            if "items" in model:
+                for item in model["items"]:
+                    custom_type = item["custom"] if "custom" in item else None
+                    if custom_type is None:
+                        i = Item(**{item})
+                        i.container_id = container_from_path(existing_path_lis)
+                        i.save()
+                    elif custom_type == Generate.ITEMS_ONLY:
+                        all_items = _spawn_items(existing_path_lis)
+                        custom_attr = item["custom_attr"] if "custom_attr" in item else {}
+                        for k, v in custom_attr:
+                            for new_item in all_items:
+                                setattr(new_item, k, v)
+                        map(lambda x: x.save(), all_items)
 
         #gen recursive models
         if "containers" in attr_dic:
