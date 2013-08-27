@@ -57,3 +57,11 @@ class Group(Base):
     def __init__(self):
         self.name = None
         self.description = None
+
+    @staticmethod
+    def unserialize(dic):
+        return Group(**dic)
+
+    @staticmethod
+    def coll_name():
+        return "groups"
