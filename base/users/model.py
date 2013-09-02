@@ -14,7 +14,6 @@ class User(Base):
         #facebook oauth
         self.fb_id = None
         self.gender = None
-        self.username = None
         self.link = None
 
         #account meta

@@ -9,6 +9,7 @@ class TaxRule(Base):
         self.description = None
         self.tax_perc = 0
         self.status = None
+        self.admin_id = None
 
         for k, v in kwargs.iteritems():
             setattr(self, k, v)

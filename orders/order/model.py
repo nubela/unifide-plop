@@ -10,10 +10,14 @@ class Order(Base):
         self.items = [] # {obj_id: None, quantity:None}
         self.request_notes = None
         self.admin_notes = None
+        self.admin_id = None
 
         #extra stuff like taxes, shipping, discounts, etc
         self.debits = [] # {obj_id: None, coll_name: None, amount=None}
         self.credits = [] # {obj_id: None, coll_name: None, amount=None}
+
+        #convenience attr
+        self.nett_total = 0
 
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
@@ -24,7 +28,6 @@ class Order(Base):
         import orders
 
 
-        print orders.total_price(self)
         return orders.total_price(self)
 
     @property

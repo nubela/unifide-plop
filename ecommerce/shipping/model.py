@@ -10,7 +10,6 @@ class ShippingRule(Base):
 
         self.price_per_unit_vol_weight = 0
         self.flat_price = 0
-        self.pricing_type = None
 
         self.min_unit_vol_weight = 0
         self.max_unit_vol_weight = 0
@@ -18,6 +17,7 @@ class ShippingRule(Base):
         self.to_location = None
 
         self.status = None
+        self.admin_id = None
 
         for k, v in kwargs.iteritems():
             setattr(self, k, v)

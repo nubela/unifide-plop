@@ -1,5 +1,14 @@
+from base.util import coerce_bson_id
 from orders.order.model import Order
 from base import items
+
+def get(order_id):
+    """
+    Get item from id
+    """
+    coll = Order.collection()
+    dic = coll.find_one({"_id": coerce_bson_id(order_id)})
+    return Order.unserialize(dic) if dic is not None else None
 
 
 def new(user_id):
