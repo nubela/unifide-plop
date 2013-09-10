@@ -20,7 +20,7 @@ def new_item_coupon(coupon_code, value, obj_id):
     c.save()
 
 
-def new_container_coupon(coupon_code, value, container_id):
+def gen_container_coupon(coupon_code, value, container_id):
     c = Coupon()
     c.coupon_scope = CouponScope.CONTAINER_WIDE
     c.coll_name = items.Container.coll_name()

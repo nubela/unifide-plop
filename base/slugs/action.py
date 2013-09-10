@@ -2,6 +2,11 @@ from base.slugs.model import Slug
 import unidecode
 
 
+def get_obj_from_slug(slug_name, itm_cls):
+    dic = get_slug_w_attr(slug_name, itm_cls.coll_name())
+    return itm_cls.unserialize(dic) if dic is not None else None
+
+
 def get_slug_w_attr(slugged_name, item_coll_name):
     dic = Slug.collection().find_one({
         "coll_name": item_coll_name,
