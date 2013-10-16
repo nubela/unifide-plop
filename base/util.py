@@ -13,7 +13,7 @@ def coerce_bson_id(str_id):
     return ObjectId(str(str_id))
 
 
-def __gen_uuid():
+def _gen_uuid():
     return str(uuid.uuid1())
 
 

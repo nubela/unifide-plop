@@ -1,7 +1,7 @@
 from base import email
 from base.users.model import User, Group
 from base.users.util import gen_passwd_hash
-from base.util import coerce_bson_id, read_template, __gen_uuid
+from base.util import coerce_bson_id, read_template, _gen_uuid
 from bson.objectid import ObjectId
 from cfg import DOMAIN
 
@@ -117,7 +117,7 @@ def generate_token(user_obj, account_activity):
     Removes an existing if it already exists, and then replace
     it with a new one that this will generate.
     """
-    user_obj.tokens[account_activity] = __gen_uuid()
+    user_obj.tokens[account_activity] = _gen_uuid()
     user_obj.save()
     return user_obj.tokens[account_activity]
 

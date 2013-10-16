@@ -1,14 +1,17 @@
 import imghdr
+import multiprocessing
 import urllib
 from decimal import Decimal
-from PIL import ExifTags
 import os
-from base import S3
-from base.S3 import S3Object
-from base.media.model import Media
-from base.util import __gen_uuid, coerce_bson_id
-from cfg import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, S3_BUCKET_NAME, UPLOAD_FOLDER, CLOUDFRONT_URL, DOMAIN, UPLOAD_RELATIVE_ENDPOINT
+
+from PIL import ExifTags
 import Image as PILImage
+from boto.s3.connection import S3Connection
+from boto.s3.key import Key
+
+from base.media.model import Media
+from base.util import _gen_uuid, coerce_bson_id
+from cfg import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, S3_BUCKET_NAME, UPLOAD_FOLDER, DOMAIN, UPLOAD_RELATIVE_ENDPOINT
 
 
 def is_image(media_stream):
@@ -18,18 +21,16 @@ def is_image(media_stream):
 
 def save(media_obj):
     col = Media.collection()
-    id = col.insert(media_obj.serialize())
+    id = col.save(media_obj.serialize())
     return id
 
 
-def __store_locally(filename, file_stream, is_img=False):
+def _store_locally(filename, file_stream, is_img=False):
     #save it to disk
     file_path = os.path.join(UPLOAD_FOLDER, filename)
     f = open(file_path, 'wb+')
     f.write(file_stream.read())
     f.close()
-
-    print file_stream.read()
 
     #fix img mode
     if is_img:
@@ -41,13 +42,17 @@ def __store_locally(filename, file_stream, is_img=False):
     return file_path
 
 
-def __store_s3(filename, img_stream):
-    conn = S3.AWSAuthConnection(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
-    obj = S3Object(img_stream.read())
-    conn.put(S3_BUCKET_NAME, filename, obj)
+def _store_s3(filename, file_path):
+    conn = S3Connection(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+    bucket = conn.get_bucket(S3_BUCKET_NAME)
+    k = Key(bucket)
+    k.key = filename
+    k.set_contents_from_filename(file_path)
+    k.set_acl('public-read')
+    return k.generate_url(expires_in=0, query_auth=False)
 
 
-def __new_img_obj(filename, height, storage, width):
+def _new_img_obj(filename, height, storage, width):
     img_obj = Media()
     img_obj.file_name = filename
     img_obj.storage = storage
@@ -58,26 +63,34 @@ def __new_img_obj(filename, height, storage, width):
     return img_obj
 
 
+def _defer_store_s3(file_path, filename, media_obj):
+    url = _store_s3(filename, file_path)
+    media_obj.storage = MediaStorage.S3
+    media_obj.url = url
+    save(media_obj)
+    os.remove(file_path)
+
+
 def save_media(media_stream, storage=None):
     if storage is None:
         storage = MediaStorage.LOCAL
 
-    #store binary
-    filename = __gen_uuid()
-    file_path = __store_locally(filename, media_stream)
-    if storage == MediaStorage.S3:
-        __store_s3(filename, media_stream)
+    #store locally first
+    filename = _gen_uuid()
+    file_path = _store_locally(filename, media_stream)
 
-    #save document record
+    #save document record (as local first)
     media_obj = Media()
     media_obj.file_name = filename
-    media_obj.storage = storage
+    media_obj.storage = MediaStorage.LOCAL
     media_obj.file_type = MediaType.OTHERS
     media_obj._id = save(media_obj)
 
-    #cleanup
-    if storage != MediaStorage.LOCAL:
-        os.remove(file_path)
+    #upload to s3, deferred/threaded
+    if storage == MediaStorage.S3:
+        t = multiprocessing.Process(target=_defer_store_s3, args=(file_path, filename, media_obj))
+        t.daemon = False
+        t.start()
 
     return media_obj
 
@@ -86,27 +99,27 @@ def save_image(image_stream, storage=None):
     if storage is None:
         storage = MediaStorage.LOCAL
 
-    #store binary
-    filename = __gen_uuid()
-    file_path = __store_locally(filename, image_stream)
-    if storage == MediaStorage.S3:
-        __store_s3(filename, image_stream)
+    #store locally first
+    filename = _gen_uuid()
+    file_path = _store_locally(filename, image_stream)
+
 
     #get pil img obj
     pil_img = PILImage.open(file_path)
     width, height = pil_img.size
 
     #save document record
-    img_obj = __new_img_obj(filename, height, storage, width)
+    img_obj = _new_img_obj(filename, height, storage, width)
 
-    #cleanup
-    if storage != MediaStorage.LOCAL:
-        os.remove(file_path)
+    if storage == MediaStorage.S3:
+        t = multiprocessing.Process(target=_defer_store_s3, args=(file_path, filename, img_obj))
+        t.daemon = False
+        t.start()
 
     return img_obj
 
 
-def __resize_img(img, new_width, new_height):
+def _resize_img(img, new_width, new_height):
     """
     resizes a larger image to a smaller one, while performing performing center crop.
     """
@@ -143,7 +156,7 @@ def __resize_img(img, new_width, new_height):
     return img
 
 
-def __rotate_upright(img):
+def _rotate_upright(img):
     #rotate of exif info exists
     if hasattr(img, "_getexif"):
         if not img._getexif() is None:
@@ -166,21 +179,21 @@ def __rotate_upright(img):
 
 def __resize(img_obj, new_height, new_width, resized_obj):
     #download + resize
-    filename = __gen_uuid()
+    filename = _gen_uuid()
     temp_file_path = os.path.join(UPLOAD_FOLDER, filename)
     urllib.urlretrieve(url_for(img_obj), temp_file_path)
     img = PILImage.open(temp_file_path)
-    img = __resize_img(__rotate_upright(img), new_width, new_height)
+    img = _resize_img(_rotate_upright(img), new_width, new_height)
     img.save(temp_file_path, "JPEG")
 
     #upload
     f = open(temp_file_path, 'r')
     if img_obj.storage == MediaStorage.S3:
-        __store_s3(filename, f)
+        _store_s3(filename, f)
     f.close()
 
     #create obj
-    resized_obj = __new_img_obj(filename, new_height, img_obj.storage, new_width)
+    resized_obj = _new_img_obj(filename, new_height, img_obj.storage, new_width)
 
     #cleanup
     if img_obj.storage != MediaStorage.LOCAL:
@@ -220,7 +233,7 @@ def find(filename, width=None, height=None):
 
 def url_for(media_obj):
     if media_obj.storage == MediaStorage.S3:
-        return "%s%s" % (CLOUDFRONT_URL, media_obj.file_name)
+        return media_obj.url
     return "%s/%s/%s" % (DOMAIN, UPLOAD_RELATIVE_ENDPOINT, media_obj.file_name)
 
 

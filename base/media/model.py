@@ -7,6 +7,7 @@ class Media(Base):
         self.file_name = None
         self.storage = None
         self.file_type = None
+        self.url = None
 
         #image meta
         self.width = None
