@@ -40,7 +40,7 @@ def total_price(order_obj):
     price = 0
     for i in order_obj.items:
         item = items.get(i["obj_id"])
-        price += item.price * i["quantity"]
+        price += float(item.price) * i["quantity"]
     return price
 
 
