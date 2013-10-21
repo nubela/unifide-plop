@@ -69,7 +69,7 @@ def _post_or_get(key, default_val=None):
 def add_to_cart():
     cart_name = _post_or_get("cart_name")
     item_id = _post_or_get("item_id")
-    qty = _post_or_get("quantity", 1)
+    qty = int(_post_or_get("quantity", 1))
     if None in (cart_name, item_id, qty):
         return jsonify({
             "status": "error",
@@ -91,6 +91,7 @@ def add_to_cart():
 def rm_from_cart():
     cart_name = _post_or_get("cart_name")
     item_id = _post_or_get("item_id")
+
     if None in (cart_name, item_id):
         return jsonify({
             "status": "error",
@@ -101,11 +102,6 @@ def rm_from_cart():
 
     if item_id in session[cart_name]:
         del session[cart_name][item_id]
-
-    order_obj = orders.Order.unserialize(session["current_order"])
-    cart.dic_to_order(session[cart_name], order_obj)
-    session["current_order"] = order_obj.serialize(json_friendly=True)
-    print session["current_order"]
 
     return jsonify({
         "status": "ok",
