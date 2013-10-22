@@ -3,11 +3,13 @@ import unidecode
 
 
 def get_obj_from_slug(slug_name, itm_cls):
+    slug_name = slug_name.lower()
     dic = get_slug_w_attr(slug_name, itm_cls.coll_name())
     return itm_cls.unserialize(dic) if dic is not None else None
 
 
 def get_slug_w_attr(slugged_name, item_coll_name):
+    slugged_name = slugged_name.lower()
     dic = Slug.collection().find_one({
         "coll_name": item_coll_name,
         "name": slugged_name
@@ -26,7 +28,7 @@ def sluggify(string_to_slugify, item_id, item_coll_name):
     if possible_slug is not None:
         return possible_slug["name"]
 
-    base_slugged_name = unidecode.unidecode(string_to_slugify)
+    base_slugged_name = unidecode.unidecode(string_to_slugify).lower()
 
     #ensure that this is unique
     i = 1
@@ -49,6 +51,7 @@ def unsluggify(slugged_name, item_coll_name, obj_class_ref):
     """
     Translates a slug into an object ID
     """
+    slugged_name = slugged_name.lower()
     slug_dic = get_slug_w_attr(slugged_name, item_coll_name)
     dic = obj_class_ref.collection().find_one({"_id": slug_dic["item_id"]})
     return obj_class_ref.unserialize(dic) if dic is not None else None
