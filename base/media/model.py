@@ -16,11 +16,9 @@ class Media(Base):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
 
-
     @staticmethod
     def unserialize(dic):
         return Media(**dic)
-
 
     @staticmethod
     def coll_name():
