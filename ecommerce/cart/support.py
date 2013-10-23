@@ -48,6 +48,11 @@ def _session_to_order():
         cart_dic = session[cart.CartType.SHOPPING] if cart.CartType.SHOPPING in session else {}
         order_obj = orders.Order.unserialize(session["current_order"])
         cart.dic_to_order(cart_dic, order_obj)
+
+    #append user_id to order
+    if current_user is not None and not current_user.is_anonymous():
+        order_obj.user_id = current_user._id
+
     return order_obj
 
 
