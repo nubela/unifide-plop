@@ -14,6 +14,10 @@ def get_slug_w_attr(slugged_name, item_coll_name):
         "coll_name": item_coll_name,
         "name": slugged_name
     })
+    print {
+        "coll_name": item_coll_name,
+        "name": slugged_name
+    }
     return dic
 
 
@@ -28,7 +32,7 @@ def sluggify(string_to_slugify, item_id, item_coll_name):
     if possible_slug is not None:
         return possible_slug["name"]
 
-    base_slugged_name = unidecode.unidecode(string_to_slugify).lower()
+    base_slugged_name = unidecode.unidecode(string_to_slugify).lower().replace(' ','-')
 
     #ensure that this is unique
     i = 1

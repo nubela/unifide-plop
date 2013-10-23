@@ -1,6 +1,6 @@
 from ecommerce import cart, coupons
 from flask import request, session, jsonify
-import flask
+from flask.ext.login import current_user
 import orders
 
 
@@ -32,8 +32,8 @@ def _update_user(order_obj):
     """
     Updates the order object with the current user logined
     """
-    if flask.ext.login.current_user is not None and not flask.ext.login.current_user.is_anonymous():
-        order_obj.user_id = flask.ext.login.current_user._id
+    if current_user is not None and not current_user.is_anonymous():
+        order_obj.user_id = current_user._id
 
 
 def _session_to_order():

@@ -1,10 +1,12 @@
 from base.base_model import Base
+from base.util import _gen_uuid
 
 
 class Order(Base):
     def __init__(self, **kwargs):
         super(Order, self).__init__()
 
+        self._id = _gen_uuid()
         self.user_id = None
         self.status = None
         self.items = [] # {obj_id: None, quantity:None}

@@ -1,5 +1,6 @@
 from base.base_model import Base
 
+
 class Media(Base):
     def __init__(self, **kwargs):
         super(Media, self).__init__()
