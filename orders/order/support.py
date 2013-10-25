@@ -61,15 +61,16 @@ def apply_cashback(order_obj):
 
 def apply_shipping(order_obj, selected_shipping_method_id):
     avail_shipping_methods = shipping.get_all_valid(order_obj)
+    print avail_shipping_methods
     all_credits = order_obj.credits
     other_credit = filter(lambda x: x["coll_name"] != shipping.ShippingRule.coll_name(), all_credits)
 
     #update shipping credit
     if len(avail_shipping_methods) > 0:
         #check if there is a submitted post
-        if selected_shipping_method_id is not None and selected_shipping_method_id in map(lambda x: x._id,
+        if selected_shipping_method_id is not None and selected_shipping_method_id in map(lambda x: str(x._id),
                                                                                           avail_shipping_methods):
-            rule_obj = filter(lambda x: x._id == selected_shipping_method_id, avail_shipping_methods)[0]
+            rule_obj = filter(lambda x: str(x._id) == selected_shipping_method_id, avail_shipping_methods)[0]
             order_obj.credits = other_credit + [{
                                                     "obj_id": rule_obj._id,
                                                     "coll_name": shipping.ShippingRule.coll_name(),
@@ -77,6 +78,7 @@ def apply_shipping(order_obj, selected_shipping_method_id):
                                                 }]
     else:
         order_obj.credits = other_credit
+    return order_obj
 
 
 def apply_coupon(order_obj, coupon_code, remove_coupon=False):

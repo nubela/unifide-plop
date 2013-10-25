@@ -1,8 +1,11 @@
 from base.base_model import Base
+from base.util import _gen_uuid
 
 
 class User(Base):
+
     def __init__(self, **kwargs):
+        self._id = _gen_uuid()
         self.username = None
         self.first_name = ""
         self.middle_name = ""
@@ -49,7 +52,7 @@ class User(Base):
 
     @staticmethod
     def coll_name():
-        return "user"
+        return "plop_users"
 
 
 class Group(Base):

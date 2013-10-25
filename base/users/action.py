@@ -63,22 +63,20 @@ def save(user_obj,
     """
 
     def save_obj():
-        coll = User.collection()
-        user_obj._id = coll.save(user_obj.serialize())
-        return user_obj
+        return user_obj.save()
 
     if need_confirmation:
         assert user_obj.email is not None
 
-    saved_user_obj = save_obj()
+    user_obj._id = save_obj()
     if need_confirmation:
-        send_confirmation(saved_user_obj,
+        send_confirmation(user_obj,
                           confirmation_email_subject,
                           confirmation_email_html,
                           relative_url=confirmation_relative_url
         )
 
-    return saved_user_obj._id
+    return user_obj._id
 
 
 def is_anon(user_obj):

@@ -37,12 +37,13 @@ def get_all_valid(order_obj, ship_to=None):
                 if hasattr(item, "location") and getattr(item, "location") != s.from_location:
                     fail_requirements = True
                     break
-        if fail_requirements: continue
+        if fail_requirements:
+            continue
 
         #weight requirements
-        if s.min_unit_vol_weight > total_weight:
+        if float(s.min_unit_vol_weight) > 0 and float(s.min_unit_vol_weight) > total_weight:
             continue
-        if s.max_unit_vol_weight < total_weight:
+        if float(s.max_unit_vol_weight) < total_weight:
             continue
 
         #add it
@@ -52,11 +53,11 @@ def get_all_valid(order_obj, ship_to=None):
 
 
 def cost(shipping_rule, order_obj):
-    if shipping_rule.pricing_type == ShippingPriceType.WEIGHT_BASED:
-        total_weight = _order_weight(order_obj)
-        return total_weight * shipping_rule.price_per_unit_vol_weight
-    else: #flat fee
-        return shipping_rule.flat_price
+    if order_obj is None or shipping_rule is None: return 0
+    total_weight = _order_weight(order_obj)
+    if total_weight == 0:
+        return float(shipping_rule.flat_price)
+    return float((total_weight * shipping_rule.price_per_unit_vol_weight) + shipping_rule.flat_price)
 
 
 class ShippingStatus:
