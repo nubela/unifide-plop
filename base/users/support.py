@@ -6,6 +6,7 @@ from base.users.util import generate_login_form, generate_form, get_form_values,
 from flask import request, render_template, redirect
 from flask.ext.login import login_user, logout_user
 from flask.helpers import url_for
+from cfg import PLOP_DOMAIN, REGISTRATION_COMPLETE_REDIRECT
 
 
 def _httpget_login():
@@ -131,7 +132,7 @@ def register_user():
 
 
 def confirm_registration(user_id, token):
-    redirect_to = request.args.get("redirect_to")
+    redirect_to = request.args.get("redirect_to", "%s%s" % (PLOP_DOMAIN, REGISTRATION_COMPLETE_REDIRECT))
     user_obj = users.get(user_id)
     if users.check_token(user_obj, users.AccountActivity.VERIFY_EMAIL_ADDR, token):
         users.confirm(user_obj)
