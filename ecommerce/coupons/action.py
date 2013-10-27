@@ -9,6 +9,7 @@ def _log(order_obj, coupon):
     l = CouponLog()
     l.used_date_utc = datetime.datetime.utcnow()
     l.user_id = order_obj.user_id
+    l.coupon_code = coupon.coupon_code
     l.order_id = order_obj._id
     l.discounted_total = coupon_discount_price(coupon, order_obj)
     return l.save()
