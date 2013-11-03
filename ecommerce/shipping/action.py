@@ -41,7 +41,8 @@ def get_all_valid(order_obj, ship_to=None):
 
         #weight requirements
         if s.min_unit_vol_weight > total_weight:
-            continue
+            #continue
+            pass
         if s.max_unit_vol_weight < total_weight:
             continue
 

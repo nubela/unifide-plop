@@ -1,6 +1,7 @@
 from base.util import coerce_bson_id
 from orders.order.model import Order
 from base import items
+from ecommerce import discounts
 
 def get(order_id):
     """
@@ -33,24 +34,46 @@ def remove_item(order_obj, item_obj):
     return filter(lambda x: x["obj_id"] != item_obj._id, order_obj.items)
 
 
-def total_price(order_obj):
+def find_item_discount(item):
+    all_discounts = discounts.get_all()
+    all_discounts.sort(key=lambda x: x.timestamp_utc)
+    for d in all_discounts:
+        if d.discount_scope == discounts.DiscountScope.ITEM_ONLY:
+            if item.id() == d.obj_id:
+                item.before_discount = item.price
+                item.price = get_discounted_price(item, d)
+                return True
+        if d.discount_scope == discounts.DiscountScope.CONTAINER_WIDE:
+            if item.container_id == d.obj_id:
+                item.before_discount = item.price
+                item.price = get_discounted_price(item, d)
+                return True
+
+
+def get_discounted_price(item, d):
+    return (float(item.price) * float((100 - d.discount_percentage) / 100)) if d.discount_percentage > 0 else float(item.price) - d.absolute_discounted_price
+
+
+def total_price(order_obj, discount=True):
     """
     Calculates the total price of all the items before any credit/debit filters
     """
     price = 0
     for i in order_obj.items:
         item = items.get(i["obj_id"])
+        if discount:
+            find_item_discount(item)
         price += float(item.price) * i["quantity"]
     return price
 
 
-def nett_price(order_obj):
+def nett_price(order_obj, discount=True):
     """
     Calculates the total price of all the times after credit/debit filters
     """
     debit = sum(map(lambda x: x["amount"], order_obj.debits))
     credit = sum(map(lambda x: x["amount"], order_obj.credits))
-    return total_price(order_obj) - debit + credit
+    return total_price(order_obj, discount) - debit + credit
 
 
 def append_credit(order_obj, credit_obj):
