@@ -73,7 +73,8 @@ def nett_price(order_obj, discount=True):
     """
     debit = sum(map(lambda x: x["amount"], order_obj.debits))
     credit = sum(map(lambda x: x["amount"], order_obj.credits))
-    return total_price(order_obj, discount) - debit + credit
+    nett = total_price(order_obj, discount) - debit
+    return nett + credit if nett > 0 else 0 + credit
 
 
 def append_credit(order_obj, credit_obj):

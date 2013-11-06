@@ -42,4 +42,4 @@ def confirm(order_obj, token, paypal_cfg):
         "payerid": details["PAYERID"],
     }
     confirmation = interface.do_express_checkout_payment(**dic)
-    return details, confirmation["ACK"] == u'Success'
+    return details, confirmation["ACK"] == u'Success', confirmation
