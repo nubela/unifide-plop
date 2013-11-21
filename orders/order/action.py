@@ -2,6 +2,7 @@ from base.util import coerce_bson_id
 from orders.order.model import Order
 from base import items
 
+
 def get(order_id):
     """
     Get item from id
@@ -9,6 +10,14 @@ def get(order_id):
     coll = Order.collection()
     dic = coll.find_one({"_id": coerce_bson_id(order_id)})
     return Order.unserialize(dic) if dic is not None else None
+
+
+def get_all(user_id):
+    coll = Order.collection()
+    dic_lis = coll.find({
+        "user_id": user_id
+    })
+    return [Order.unserialize(d) for d in dic_lis]
 
 
 def new(user_id):
@@ -48,6 +57,8 @@ def nett_price(order_obj):
     """
     Calculates the total price of all the times after credit/debit filters
     """
+    if len(order_obj.items) == 0:
+        return 0
     debit = sum(map(lambda x: x["amount"], order_obj.debits))
     credit = sum(map(lambda x: x["amount"], order_obj.credits))
     return total_price(order_obj) - debit + credit

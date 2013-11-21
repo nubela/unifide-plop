@@ -16,7 +16,7 @@ def _log(admin_id, user_id, cashback_rule=None, order_id=None, value=None, ltype
 
 def get_store(user_id):
     dic = CreditStore.collection().find_one({"user_id": user_id})
-    return CreditLog.unserialize(dic) if dic is not None else None
+    return CreditStore.unserialize(dic) if dic is not None else None
 
 
 def give(admin_id, user_id, amount):
@@ -40,16 +40,18 @@ def debit(admin_id, user_id, order_id, amount):
 def new_store(user_id):
     store = CreditStore()
     store.user_id = user_id
-    store.save()
+    store._id = store.save()
     return store
 
 
 def credit(admin_id, user_id, order_obj, cashback_rule):
     amount = cashback_value(cashback_rule, order_obj)
     store = get_store(user_id)
-    if store is None: store = new_store(user_id)
 
-    store.total_credit += amount
+    if store is None:
+        store = new_store(user_id)
+
+    store.total_credit += float(amount)
     store.save()
 
     _log(admin_id, user_id, cashback_rule=cashback_rule, order_id=order_obj._id, value=amount,
@@ -60,8 +62,6 @@ def credit(admin_id, user_id, order_obj, cashback_rule):
 def reversal(admin_id, user_id, order_obj, cashback_rule):
     amount = cashback_value(cashback_rule, order_obj)
     store = get_store(user_id)
-
-    store.total_credit -= amount
     store.save()
 
     _log(admin_id, user_id, cashback_rule=cashback_rule, order_id=order_obj._id, value=amount,
@@ -72,7 +72,7 @@ def reversal(admin_id, user_id, order_obj, cashback_rule):
 def cashback_value(cashback_rule, order_obj):
     price = orders.total_price(order_obj)
     price = Decimal(price) * Decimal(cashback_rule.cashback_percentage) / Decimal(100)
-    return price
+    return float(price)
 
 
 def get():
@@ -80,7 +80,6 @@ def get():
         "status": CashbackStatus.ENABLED,
     })
     return CashbackRule.unserialize(dic) if dic is not None else None
-
 
 class CreditLogType:
     DEBIT = "debit"

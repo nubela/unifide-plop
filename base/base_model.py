@@ -1,5 +1,6 @@
 import datetime
 import time
+from pprint import pprint
 from bson import ObjectId
 from base.db import get_mongo
 from base.util import coerce_bson_id
@@ -33,7 +34,7 @@ class Base(object):
     def save(self):
         self.modification_timestamp_utc = datetime.datetime.utcnow()
         col = self.collection()
-        id = col.save(self.serialize())
+        id = col.save(self.serialize(), safe=True)
         return id
 
     @staticmethod

@@ -5,6 +5,7 @@ class CashbackRule(Base):
     """
     Depicts the rules of cashbacks
     """
+
     def __init__(self, **kwargs):
         super(CashbackRule, self).__init__()
 
@@ -36,6 +37,7 @@ class CreditStore(Base):
     """
     Logs how much a user has stored in credit from cashbacks
     """
+
     def __init__(self, **kwargs):
         super(CreditStore, self).__init__()
 
@@ -58,6 +60,7 @@ class CreditLog(Base):
     """
     Logs every credit/debit of the cashback value to a user account
     """
+
     def __init__(self, **kwargs):
         super(CreditLog, self).__init__()
 

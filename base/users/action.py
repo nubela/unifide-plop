@@ -101,7 +101,7 @@ def set_passwd(saved_user_obj, new_passwd):
     """
     Sets a new password for a given user object that already exists in the collection
     """
-    passwd_hash = gen_passwd_hash(new_passwd, saved_user_obj.obj_id())
+    passwd_hash = gen_passwd_hash(new_passwd, saved_user_obj._id)
     saved_user_obj.passwd_hash = passwd_hash
     saved_user_obj.save()
     return saved_user_obj
