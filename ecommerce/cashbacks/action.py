@@ -7,7 +7,7 @@ def _log(admin_id, user_id, cashback_rule=None, order_id=None, value=None, ltype
     c = CreditLog()
     c.admin_id = admin_id
     c.user_id = user_id
-    c.cashback_rule_id = cashback_rule._id
+    c.cashback_rule_id = cashback_rule._id if cashback_rule is not None else None
     c.order_id = order_id
     c.credited_value = value
     c.type = ltype

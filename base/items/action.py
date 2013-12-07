@@ -216,6 +216,21 @@ def get_all(container_obj, find_param_lis=None, limit=None):
                                                "container_id": container_obj.obj_id() if container_obj is not None else None}
                                        ] + find_param_lis,
                            }, **args)
+
+    #sort items
+    if container_obj is not None:
+        item_sorted_ids = container_obj.item_ids_sorted
+
+        #sorting function for sorted(), to fetch the indices of the id in the sorted id array
+        def sorting_fn(itm):
+            id_str = str(itm['_id'])
+            if id_str not in item_sorted_ids:
+                return 99999 #a large number. don't think we'll ever find more than 99999 items in a container
+            return item_sorted_ids.index(id_str)
+
+        #sort list
+        lis_of_dic = sorted(lis_of_dic, key=sorting_fn)
+
     return [Item.unserialize(x) for x in lis_of_dic]
 
 

@@ -15,6 +15,7 @@ class Container(Base):
         self.description = None
         self.slug_name = None
         self.materialized_path = None #represented in list repr
+        self.item_ids_sorted = [] #item id (in string) with sorted positions
         self.parent_id = None
 
         for k, v in kwargs.iteritems():
