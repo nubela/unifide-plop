@@ -3,7 +3,12 @@ from base.users.model import User, Group
 from base.users.util import gen_passwd_hash
 from base.util import coerce_bson_id, read_template, _gen_uuid
 from bson.objectid import ObjectId
-from cfg import PLOP_DOMAIN, MAIL_OUTBOUND_REALNAME, MAIL_OUTBOUND_REPLYTO
+try:
+    from cfg import PLOP_DOMAIN, MAIL_OUTBOUND_REALNAME, MAIL_OUTBOUND_REPLYTO
+except ImportError:
+    PLOP_DOMAIN = None
+    MAIL_OUTBOUND_REALNAME = None
+    MAIL_OUTBOUND_REPLYTO = None
 
 
 def get(user_id):
