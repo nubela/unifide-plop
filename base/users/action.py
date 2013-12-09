@@ -1,9 +1,9 @@
-from base import email
+from base.email import Mail
 from base.users.model import User, Group
 from base.users.util import gen_passwd_hash
 from base.util import coerce_bson_id, read_template, _gen_uuid
 from bson.objectid import ObjectId
-from cfg import DOMAIN
+from cfg import PLOP_DOMAIN, MAIL_OUTBOUND_REALNAME, MAIL_OUTBOUND_REPLYTO
 
 
 def get(user_id):
@@ -23,7 +23,7 @@ def confirm(user_obj):
     """
     coll = User.collection()
     user_obj.account_status = AccountStatus.ENABLED
-    coll.update({'_id': user_obj.obj_id()}, {"$set": user_obj.serialize()}, upsert=False)
+    coll.update({'_id': user_obj.obj_id()}, user_obj.serialize(), upsert=False)
 
 
 def send_confirmation(user_obj, email_subject=None, email_html=None, relative_url=None):
@@ -35,9 +35,10 @@ def send_confirmation(user_obj, email_subject=None, email_html=None, relative_ur
         relative_url = "/register/confirm/"
 
     token = generate_token(user_obj, AccountActivity.VERIFY_EMAIL_ADDR)
-    url = "%s%s%s/%s/" % (DOMAIN, relative_url, user_obj.id(), token)
+    url = "%s%s%s/%s/" % (PLOP_DOMAIN, relative_url, user_obj.id(), token)
     email_html = email_html % {"url": url}
-    email.send_email(user_obj.email, email_subject, email_html, async=False)
+    mail = Mail(MAIL_OUTBOUND_REALNAME, MAIL_OUTBOUND_REPLYTO)
+    mail.send(user_obj.email, email_subject, email_html, async=True)
 
 
 def get_user_by_attr(attr_dic):
@@ -92,9 +93,10 @@ def send_reset_passwd_notice(user_obj, email_subj=None, email_html=None, relativ
         relative_url = "/user/reset-password/"
 
     token = generate_token(user_obj, AccountActivity.RESET_PASSWORD)
-    url = "%s%s%s/%s/" % (DOMAIN, relative_url, user_obj.id(), token)
+    url = "%s%s%s/%s/" % (PLOP_DOMAIN, relative_url, user_obj.id(), token)
     email_html = email_html % {"url": url}
-    email.send_email(user_obj.email, email_subj, email_html)
+    mail = Mail(MAIL_OUTBOUND_REALNAME, MAIL_OUTBOUND_REPLYTO)
+    mail.send(user_obj.email, email_subj, email_html, async=True)
 
 
 def set_passwd(saved_user_obj, new_passwd):
@@ -131,7 +133,7 @@ def remove_token(user_obj, account_activity):
     if account_activity in user_obj.tokens:
         del user_obj.tokens[account_activity]
         coll = User.collection()
-        coll.update({'_id': ObjectId(user_obj._id)}, {"$set": user_obj.serialize()}, upsert=False)
+        coll.update({'_id': ObjectId(user_obj._id)}, user_obj.serialize(), upsert=False)
 
 
 def __get_token(user_obj, account_activity):

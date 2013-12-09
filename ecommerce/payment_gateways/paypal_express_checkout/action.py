@@ -10,7 +10,7 @@ class PaypalCfg:
         self.ORDER_DESCRIPTION = None
 
 
-def get_checkout_url(order_obj, paypal_cfg):
+def get_checkout_url(order_obj, paypal_cfg, shipping=0, notes=0):
     interface = PayPalInterface(PayPalConfig(**paypal_cfg.CONFIG))
     resp = interface.set_express_checkout(**{
         "returnurl": paypal_cfg.RETURN_URL,
@@ -20,6 +20,8 @@ def get_checkout_url(order_obj, paypal_cfg):
         "currencycode": paypal_cfg.CURRENCY_CODE,
         "desc": paypal_cfg.ORDER_DESCRIPTION,
         "useraction": "commit",
+        "noshipping": shipping,
+        "allownote": 0
     })
     token = resp.token
     redir_url = interface.generate_express_checkout_redirect_url(token)
@@ -40,4 +42,4 @@ def confirm(order_obj, token, paypal_cfg):
         "payerid": details["PAYERID"],
     }
     confirmation = interface.do_express_checkout_payment(**dic)
-    return details, confirmation["ACK"] == u'Success'
+    return details, confirmation["ACK"] == u'Success', confirmation

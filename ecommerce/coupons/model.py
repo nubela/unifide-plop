@@ -48,6 +48,7 @@ class CouponLog(Base):
 
         self.used_date_utc = None
         self.user_id = None
+        self.coupon_code = None
         self.order_id = None
         self.discounted_total = 0
 
