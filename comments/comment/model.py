@@ -1,10 +1,12 @@
 from base.base_model import Base
+from base.util import _gen_uuid, coerce_bson_id
 
 
 class Comment(Base):
     def __init__(self, **kwargs):
         super(Comment, self).__init__()
 
+        self._id = _gen_uuid()
         self.user_id = None
         self.comment = None
         self.obj_id = None

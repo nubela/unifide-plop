@@ -8,7 +8,7 @@ from cfg import DOMAIN
 
 def get(user_id):
     coll = User.collection()
-    dic = coll.find_one({"_id": coerce_bson_id(user_id)})
+    dic = coll.find_one({"_id": user_id})
     user_obj = User.unserialize(dic) if dic is not None else None
     return user_obj
 

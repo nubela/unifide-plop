@@ -15,10 +15,10 @@ def comment(user_obj, comment_str, obj_id, coll_name):
     :return comment_obj_id:
     """
     comment_obj = Comment()
-    comment_obj.user_id = user_obj.obj_id()
+    comment_obj.user_id = user_obj._id
     comment_obj.comment = comment_str
     comment_obj.coll_name = coll_name
-    comment_obj.obj_id = coerce_bson_id(obj_id)
+    comment_obj.obj_id = obj_id
     return save(comment_obj)
 
 
@@ -41,7 +41,7 @@ def get_all(obj_id, collection_name, limit=None):
     :param limit:
     """
     comments = Comment.collection().find({
-        "obj_id": coerce_bson_id(obj_id),
+        "obj_id": str(obj_id),
         "coll_name": collection_name
     }).sort("timestamp_utc", pymongo.DESCENDING)
     comment_obj_lis = [Comment.unserialize(x) for x in comments]
