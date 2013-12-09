@@ -14,10 +14,6 @@ def get_slug_w_attr(slugged_name, item_coll_name):
         "coll_name": item_coll_name,
         "name": slugged_name
     })
-    print {
-        "coll_name": item_coll_name,
-        "name": slugged_name
-    }
     return dic
 
 

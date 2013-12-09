@@ -14,7 +14,7 @@ def _order_weight(order_obj):
     for i in order_obj.items:
         item_obj = items.get(i["obj_id"])
         if hasattr(item_obj, "weight") and item_obj.weight is not None:
-            total_weight += item_obj.weight * i['quantity']
+            total_weight += float(item_obj.weight) * float(i['quantity'])
     return total_weight
 
 

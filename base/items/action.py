@@ -57,7 +57,6 @@ def remove(item_id):
 
 def remove_container(container_id):
     coll = Container.collection()
-    print container_id
     coll.remove({"_id": coerce_bson_id(container_id)})
 
 
