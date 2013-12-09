@@ -3,7 +3,15 @@ from email.mime.text import MIMEText
 import smtplib
 from threading import Thread
 
-from cfg import MAIL_OUTBOUND_HOST, MAIL_OUTBOUND_PORT, MAIL_OUTBOUND_USER, MAIL_OUTBOUND_PASSWD
+
+try:
+    from cfg import MAIL_OUTBOUND_HOST, MAIL_OUTBOUND_PORT, MAIL_OUTBOUND_USER, MAIL_OUTBOUND_PASSWD
+except ImportError:
+    MAIL_OUTBOUND_HOST = None
+    MAIL_OUTBOUND_PORT = None
+    MAIL_OUTBOUND_USER = None
+    MAIL_OUTBOUND_PASSWD = None
+
 
 class Mail:
     """
@@ -14,7 +22,6 @@ class Mail:
                  user_real_name,
                  user_email,
                  **kwargs):
-
         #smtp settings
         self.smtp_server_host = MAIL_OUTBOUND_HOST
         self.smtp_server_port = MAIL_OUTBOUND_PORT
