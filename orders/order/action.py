@@ -9,7 +9,7 @@ def get(order_id):
     Get item from id
     """
     coll = Order.collection()
-    dic = coll.find_one({"_id": coerce_bson_id(order_id)})
+    dic = coll.find_one({"_id": order_id})
     return Order.unserialize(dic) if dic is not None else None
 
 

@@ -61,7 +61,6 @@ def apply_cashback(order_obj):
 
 def apply_shipping(order_obj, selected_shipping_method_id):
     avail_shipping_methods = shipping.get_all_valid(order_obj)
-    print avail_shipping_methods
     all_credits = order_obj.credits
     other_credit = filter(lambda x: x["coll_name"] != shipping.ShippingRule.coll_name(), all_credits)
 
@@ -76,8 +75,11 @@ def apply_shipping(order_obj, selected_shipping_method_id):
                                                     "coll_name": shipping.ShippingRule.coll_name(),
                                                     "amount": shipping.cost(rule_obj, order_obj),
                                                 }]
+            order_obj.shipping_rule_id = rule_obj._id
+
     else:
         order_obj.credits = other_credit
+
     return order_obj
 
 

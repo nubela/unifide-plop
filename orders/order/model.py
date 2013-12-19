@@ -10,6 +10,8 @@ class Order(Base):
         self.user_id = None
         self.status = None
         self.items = [] # {obj_id: None, quantity:None}
+        self.shipping_rule_id = None
+        self.ship_to_address = None
         self.request_notes = None
         self.admin_notes = None
         self.admin_id = None
