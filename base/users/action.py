@@ -141,7 +141,7 @@ def remove_token(user_obj, account_activity):
     if account_activity in user_obj.tokens:
         del user_obj.tokens[account_activity]
         coll = User.collection()
-        coll.update({'_id': ObjectId(user_obj._id)}, user_obj.serialize(), upsert=False)
+        coll.update({'_id': user_obj._id}, user_obj.serialize(), upsert=False)
 
 
 def __get_token(user_obj, account_activity):

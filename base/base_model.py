@@ -18,7 +18,7 @@ class Base(object):
         """
         for pymongo parsing
         """
-        return coerce_bson_id(self._id)
+        return self._id
 
     def serialize(self, json_friendly=False):
         dic = {k: v for k, v in self.__dict__.iteritems()}
