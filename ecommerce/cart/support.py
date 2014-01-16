@@ -83,7 +83,7 @@ def add_to_cart():
     if cart_name not in session:
         session[cart_name] = {}
     if item_id in session[cart_name]:
-        session[cart_name][item_id] += qty
+        session[cart_name][item_id] = qty
     else:
         session[cart_name][item_id] = qty
 
@@ -110,7 +110,11 @@ def rm_from_cart():
         del session[cart_name][item_id]
 
     #remove the item from the order as well
-    order_obj = orders.Order.unserialize(session["current_order"])
+    order_obj = None
+    if "current_order" not in session:
+        cart_dic = session[cart.CartType.SHOPPING] if cart.CartType.SHOPPING in session else {}
+        order_obj = cart.to_order(cart_dic)
+    else: order_obj = orders.Order.unserialize(session["current_order"])
     cart.dic_to_order(session[cart_name], order_obj)
     session["current_order"] = order_obj.serialize(json_friendly=True)
 

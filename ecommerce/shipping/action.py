@@ -1,6 +1,13 @@
 from base import items
+from base.util import coerce_bson_id
 from ecommerce.shipping.model import ShippingRule
 
+
+def get(shipping_rule_id):
+    dic = ShippingRule.collection().find_one({
+        "_id": coerce_bson_id(shipping_rule_id),
+    })
+    return ShippingRule.unserialize(dic) if dic is not None else None
 
 def get_all():
     dic_lis = ShippingRule.collection().find({
